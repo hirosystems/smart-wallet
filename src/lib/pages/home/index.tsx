@@ -1,6 +1,7 @@
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Flex, Text } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
+import { Balances } from '~/lib/components/Balances';
 import ContractCallVote from '~/lib/components/ContractCallVote';
 
 const Home = () => {
@@ -15,11 +16,15 @@ const Home = () => {
       w="full"
     >
       <NextSeo title="Home" />
+      <Balances />
       <Text fontSize="xl" fontWeight="bold">
         With the Smart Wallet you add a layer of security to your STX tokens.
-        With our 2 of 3 multisig wallet you can be sure that your tokens are safe.
+        With our 2 of 3 multisig wallet you can be sure that your tokens are
+        safe.
       </Text>
-      <Link href={{ pathname: '/authenticate', query: { address: '' } }}>Authenticate</Link>
+      <Link href={{ pathname: '/authenticate', query: { address: '' } }}>
+        Authenticate
+      </Link>
       <ContractCallVote />
     </Flex>
   );

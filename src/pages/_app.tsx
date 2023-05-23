@@ -1,15 +1,19 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { DefaultSeo } from 'next-seo';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { DefaultSeo } from 'next-seo';
 
-import defaultSEOConfig from '../../next-seo.config';
+import { Connect } from '@stacks/connect-react';
 import { Chakra } from '~/lib/components/Chakra';
+import { userSession } from '~/lib/components/ConnectWallet';
+import { HiroWalletProvider } from '~/lib/components/HiroWalletContext';
 import Layout from '~/lib/layout';
 import '~/lib/styles/globals.css';
-import { userSession } from '~/lib/components/ConnectWallet'
-import { Connect } from '@stacks/connect-react';
-import { HiroWalletProvider } from '~/lib/components/HiroWalletContext';
+import defaultSEOConfig from '../../next-seo.config';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
@@ -21,25 +25,27 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         />
       </Head>
       <DefaultSeo {...defaultSEOConfig} />
-      <Layout>
-        <HiroWalletProvider>
-          <Connect
-            authOptions={{
-              appDetails: {
-                name: "Stacks Next.js Template",
-                icon: '',
-              },
-              redirectTo: "/",
-              onFinish: () => {
-                window.location.reload();
-              },
-              userSession,
-            }}
-          >
-            <Component {...pageProps} />
-          </Connect>
-        </HiroWalletProvider>
-      </Layout>
+      <QueryClientProvider client={queryClient}>
+        <Layout>
+          <HiroWalletProvider>
+            <Connect
+              authOptions={{
+                appDetails: {
+                  name: 'Stacks Next.js Template',
+                  icon: '',
+                },
+                redirectTo: '/',
+                onFinish: () => {
+                  window.location.reload();
+                },
+                userSession,
+              }}
+            >
+              <Component {...pageProps} />
+            </Connect>
+          </HiroWalletProvider>
+        </Layout>
+      </QueryClientProvider>
     </Chakra>
   );
 };

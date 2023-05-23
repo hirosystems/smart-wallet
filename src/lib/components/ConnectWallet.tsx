@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
-import { Button } from "@chakra-ui/react";
+import { Button } from '@chakra-ui/react';
+import { AppConfig, showConnect, UserSession } from '@stacks/connect';
+import { useEffect, useState } from 'react';
 
-const appConfig = new AppConfig(["store_write", "publish_data"]);
+const appConfig = new AppConfig(['store_write', 'publish_data']);
 
 export const userSession = new UserSession({ appConfig });
 
 function authenticate() {
   showConnect({
     appDetails: {
-      name: "Smart Wallet",
-      icon: window.location.origin + "/logo512.png",
+      name: 'Smart Wallet',
+      icon: window.location.origin + '/logo512.png',
     },
-    redirectTo: "/",
+    redirectTo: '/',
     onFinish: () => {
       window.location.reload();
     },
@@ -21,7 +21,7 @@ function authenticate() {
 }
 
 function disconnect() {
-  userSession.signUserOut("/");
+  userSession.signUserOut('/');
 }
 
 const ConnectWallet = () => {
@@ -32,7 +32,7 @@ const ConnectWallet = () => {
     return (
       <div>
         <Button className="Connect" onClick={disconnect}>
-          Disconnect  { userSession.loadUserData().profile.stxAddress.testnet }
+          Disconnect {userSession.loadUserData().profile.stxAddress.testnet}
         </Button>
       </div>
     );
