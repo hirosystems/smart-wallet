@@ -4,12 +4,9 @@ const SomeText = () => {
   return (
     <Grid textAlign="center">
       <Heading as="h1" size="lg">
-        nextarter-chakra
+        Smart Wallet
       </Heading>
 
-      <Text fontSize="xs">
-        This is a Next.js app with Chakra-UI and TypeScript setup.
-      </Text>
     </Grid>
   );
 };

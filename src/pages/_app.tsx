@@ -7,6 +7,9 @@ import defaultSEOConfig from '../../next-seo.config';
 import { Chakra } from '~/lib/components/Chakra';
 import Layout from '~/lib/layout';
 import '~/lib/styles/globals.css';
+import { userSession } from '~/lib/components/ConnectWallet'
+import { Connect } from '@stacks/connect-react';
+import { HiroWalletProvider } from '~/lib/components/HiroWalletContext';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
@@ -19,7 +22,23 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       </Head>
       <DefaultSeo {...defaultSEOConfig} />
       <Layout>
-        <Component {...pageProps} />
+        <HiroWalletProvider>
+          <Connect
+            authOptions={{
+              appDetails: {
+                name: "Stacks Next.js Template",
+                icon: '',
+              },
+              redirectTo: "/",
+              onFinish: () => {
+                window.location.reload();
+              },
+              userSession,
+            }}
+          >
+            <Component {...pageProps} />
+          </Connect>
+        </HiroWalletProvider>
       </Layout>
     </Chakra>
   );

@@ -1,5 +1,5 @@
 {
-  "name": "nextarter-chakra",
+  "name": "smart-wallet",
   "version": "0.1.0",
   "private": true,
   "author": "sozonome",
@@ -19,13 +19,16 @@
     "up-interactive": "pnpm up -i",
     "up-latest": "pnpm up-interactive -L",
     "release": "cross-env HUSKY=0 standard-version",
-    "push-release": "git push --follow-tags origin main",
-    "prepare": "husky install"
+    "push-release": "git push --follow-tags origin main"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.6.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@stacks/connect": "^7.1.1",
+    "@stacks/connect-react": "^21.0.1",
+    "@stacks/network": "^6.1.0",
+    "@stacks/transactions": "^6.1.0",
     "framer-motion": "^10.12.4",
     "next": "^13.3.1",
     "next-pwa": "^5.6.0",
@@ -45,7 +48,6 @@
     "eslint": "^8.39.0",
     "eslint-config-next": "^13.3.1",
     "eslint-config-sznm": "^1.1.1",
-    "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
     "next-sitemap": "^4.0.7",
     "prettier": "^2.8.8",

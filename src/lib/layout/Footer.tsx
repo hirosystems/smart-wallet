@@ -5,8 +5,8 @@ const Footer = () => {
     <Flex as="footer" width="full" justifyContent="center">
       <Text fontSize="sm">
         {new Date().getFullYear()} -{' '}
-        <Link href="https://sznm.dev" isExternal rel="noopener noreferrer">
-          sznm.dev
+        <Link href="" isExternal rel="noopener noreferrer">
+          Smart Wallet
         </Link>
       </Text>
     </Flex>

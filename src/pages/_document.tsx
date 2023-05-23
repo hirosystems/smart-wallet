@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { ColorModeScript } from '@chakra-ui/react';
+import { Connect } from '@stacks/connect-react';
 import type { DocumentContext } from 'next/document';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
@@ -25,7 +26,8 @@ class MyDocument extends Document {
           <ColorModeScript
             initialColorMode={customTheme.config?.initialColorMode}
           />
-          <Main />
+            <Main />
+          
           <NextScript />
         </body>
       </Html>
