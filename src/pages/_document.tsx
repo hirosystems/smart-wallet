@@ -26,8 +26,8 @@ class MyDocument extends Document {
           <ColorModeScript
             initialColorMode={customTheme.config?.initialColorMode}
           />
-            <Main />
-          
+          <Main />
+
           <NextScript />
         </body>
       </Html>

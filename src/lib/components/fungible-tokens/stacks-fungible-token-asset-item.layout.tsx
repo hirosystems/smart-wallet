@@ -1,14 +1,16 @@
 // import { Box, BoxProps, Stack } from '@stacks/ui';
 // import { forwardRefWithAs } from '@stacks/ui-core';
 
-import { Box, BoxProps, Flex, Stack, Text } from '@chakra-ui/react';
+import type { BoxProps } from '@chakra-ui/react';
+import { Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { Money } from '~/lib/utils/format-money';
-import { ftDecimals } from '~/lib/utils/fungible-tokens-utils';
-import { getFormattedBalance } from '~/lib/utils/stacks-crypto-asset.utils';
+
 import { AssetCaption } from '../asset-caption';
 import { usePressable } from '../item-hover';
 import { SubBalance } from '../sub-balance';
+import type { Money } from '~/lib/utils/format-money';
+import { ftDecimals } from '~/lib/utils/fungible-tokens-utils';
+import { getFormattedBalance } from '~/lib/utils/stacks-crypto-asset.utils';
 
 // import type { Money } from '@shared/models/money.model';
 

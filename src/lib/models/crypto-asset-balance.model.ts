@@ -1,7 +1,8 @@
-import BigNumber from 'bignumber.js';
-import { Money } from '../utils/format-money';
+import type BigNumber from 'bignumber.js';
 
-import {
+import type { Money } from '../utils/format-money';
+
+import type {
   BitcoinCryptoCurrencyAsset,
   StacksCryptoCurrencyAsset,
   StacksFungibleTokenAsset,

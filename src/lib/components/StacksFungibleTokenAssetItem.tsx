@@ -3,14 +3,16 @@
 // import { getAssetName } from '@stacks/ui-utils';
 // import { CryptoAssetSelectors } from '@tests/selectors/crypto-asset.selectors';
 
-import { BoxProps } from '@chakra-ui/react';
+import type { BoxProps } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
-import { Money } from '../utils/format-money';
+
+import type { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
+import type { Money } from '../utils/format-money';
 import {
   formatContractId,
   getImageCanonicalUri,
 } from '../utils/stacks-crypto-asset.utils';
+
 import { StacksFungibleTokenAssetItemLayout } from './fungible-tokens/stacks-fungible-token-asset-item.layout';
 
 // import type { StacksFungibleTokenAssetBalance } from '@shared/models/crypto-asset-balance.model';

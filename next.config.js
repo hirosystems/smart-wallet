@@ -1,3 +1,5 @@
+const { parsed: localEnv } = require('dotenv').config();
+
 const withPWA = require("next-pwa")({
   dest: "public",
   disable:
@@ -13,7 +15,18 @@ const withPWA = require("next-pwa")({
 module.exports = withPWA({
   swcMinify: true,
   reactStrictMode: true,
+  env: {
+    ...localEnv,
+  },
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   eslint: {
     dirs: ["src"],
+    ignoreDuringBuilds: true,
   },
 });

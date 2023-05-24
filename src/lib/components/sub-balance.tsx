@@ -1,7 +1,8 @@
+import { Box, Text } from '@chakra-ui/react';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { Box, Text} from '@chakra-ui/react';
+
+import type { Money } from '../utils/format-money';
 import { ftDecimals } from '../utils/fungible-tokens-utils';
-import { Money } from '../utils/format-money';
 
 interface SubBalanceProps {
   balance: Money;

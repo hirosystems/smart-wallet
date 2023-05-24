@@ -1,4 +1,4 @@
-import { BoxProps } from '@chakra-ui/react';
+import type { BoxProps } from '@chakra-ui/react';
 
 import { StacksUnanchoredStatusIcon } from './stacks-unanchored-status-icon';
 import { StxAvatar } from './stx-avatar';
@@ -24,12 +24,20 @@ export const StacksAssetAvatar = ({
 
   if (imageCanonicalUri)
     return (
-      <img height={imageDimension} width={imageDimension} src={encodeURI(imageCanonicalUri)} />
+      <img
+        height={imageDimension}
+        width={imageDimension}
+        src={encodeURI(imageCanonicalUri)}
+      />
     );
   if (!gradientString) return null;
 
   return (
-    <DynamicColorCircle color={color} size={imageDimension} string={gradientString}>
+    <DynamicColorCircle
+      color={color}
+      size={imageDimension}
+      string={gradientString}
+    >
       {children}
       {isUnanchored ? <StacksUnanchoredStatusIcon /> : null}
     </DynamicColorCircle>

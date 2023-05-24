@@ -6,6 +6,7 @@ import {
   stringUtf8CV,
 } from '@stacks/transactions';
 import { useEffect, useState } from 'react';
+
 import { userSession } from './ConnectWallet';
 
 const ContractCallVote = () => {
@@ -14,7 +15,7 @@ const ContractCallVote = () => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  function vote(pick) {
+  function vote(pick: any) {
     doContractCall({
       network: new StacksTestnet(),
       anchorMode: AnchorMode.Any,

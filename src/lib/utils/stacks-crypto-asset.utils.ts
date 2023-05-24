@@ -1,6 +1,8 @@
 import { isWebUri } from 'valid-url';
+
 import { isUndefined } from '../hooks/use-stx-balance';
-import { StacksFungibleTokenAsset } from '../models/crypto-asset.model';
+import type { StacksFungibleTokenAsset } from '../models/crypto-asset.model';
+
 import { abbreviateNumber } from './number-utils';
 
 function removeCommas(amountWithCommas: string) {
@@ -49,7 +51,7 @@ export function isValidUrl(str: string) {
 export const KEBAB_REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
 
 function kebabCase(str: string) {
-  return str.replace(KEBAB_REGEX, (match) => '-' + match.toLowerCase());
+  return str.replace(KEBAB_REGEX, (match) => `-${match.toLowerCase()}`);
 }
 
 function getLetters(string: string, offset = 1) {

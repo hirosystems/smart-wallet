@@ -1,7 +1,9 @@
 import { Box } from '@chakra-ui/react';
 import { useContext } from 'react';
+
 import { useStxAssetBalance } from '../hooks/use-stx-balance';
 import { useStacksFungibleTokenAssetBalancesAnchoredWithMetadata } from '../query/balance';
+
 import HiroWalletContext from './HiroWalletContext';
 import { StacksFungibleTokenAssetList } from './StacksFungibleTokensAssetList';
 import StxBalance from './StxBalance';

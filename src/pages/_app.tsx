@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { DefaultSeo } from 'next-seo';
+import { Connect } from '@stacks/connect-react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { DefaultSeo } from 'next-seo';
 
-import { Connect } from '@stacks/connect-react';
 import { Chakra } from '~/lib/components/Chakra';
 import { userSession } from '~/lib/components/ConnectWallet';
 import { HiroWalletProvider } from '~/lib/components/HiroWalletContext';
@@ -13,9 +13,10 @@ import defaultSEOConfig from '../../next-seo.config';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const queryClient = new QueryClient();
+console.log('envs', process.env);
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const queryClient = new QueryClient();
   return (
     <Chakra>
       <Head>

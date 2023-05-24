@@ -16,6 +16,7 @@ export function AssetCaption({ caption, isUnanchored }: AssetCaptionProps) {
             <a
               href="https://docs.stacks.co/understand-stacks/microblocks"
               target="_blank"
+              rel="noreferrer"
             >
               <Box
                 _hover={{ cursor: 'pointer' }}

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useConnect } from "@stacks/connect-react";
-import { StacksTestnet } from "@stacks/network";
+import { useConnect } from '@stacks/connect-react';
+import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
   PostConditionMode,
   stringUtf8CV,
-} from "@stacks/transactions";
-import { userSession } from "./ConnectWallet";
+} from '@stacks/transactions';
+import React, { useEffect, useState } from 'react';
+
+import { userSession } from './ConnectWallet';
 
 const SmartWalletContractCall = () => {
   const { doContractCall } = useConnect();
@@ -14,8 +15,7 @@ const SmartWalletContractCall = () => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  function vote(pick) {
-  }
+  function vote(pick) {}
 
   if (!mounted || !userSession.isUserSignedIn()) {
     return null;
@@ -24,10 +24,10 @@ const SmartWalletContractCall = () => {
   return (
     <div>
       <h3>Vote via Smart Contract</h3>
-      <button className="Vote" onClick={() => vote("🍊")}>
+      <button className="Vote" onClick={() => vote('🍊')}>
         Vote for 🍊
       </button>
-      <button className="Vote" onClick={() => vote("🍎")}>
+      <button className="Vote" onClick={() => vote('🍎')}>
         Vote for 🍎
       </button>
     </div>

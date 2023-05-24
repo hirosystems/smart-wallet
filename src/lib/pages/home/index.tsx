@@ -1,10 +1,14 @@
-import { Flex, Text } from '@chakra-ui/react';
-import { NextSeo } from 'next-seo';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
+import { NextSeo } from 'next-seo';
+import { useContext } from 'react';
+
 import { Balances } from '~/lib/components/Balances';
-import ContractCallVote from '~/lib/components/ContractCallVote';
+import HiroWalletContext from '~/lib/components/HiroWalletContext';
 
 const Home = () => {
+  const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
+    useContext(HiroWalletContext);
   return (
     <Flex
       direction="column"
@@ -19,13 +23,20 @@ const Home = () => {
       <Balances />
       <Text fontSize="xl" fontWeight="bold">
         With the Smart Wallet you add a layer of security to your STX tokens.
-        With our 2 of 3 multisig wallet you can be sure that your tokens are
+        With our 2 of 2 multisig wallet you can be sure that your tokens are
         safe.
       </Text>
-      <Link href={{ pathname: '/authenticate', query: { address: '' } }}>
-        Authenticate
-      </Link>
-      <ContractCallVote />
+      {!isWalletConnected ? (
+        <Link
+          as="Button"
+          href={{ pathname: '/authenticate', query: { address: '' } }}
+        >
+          Authenticate
+        </Link>
+      ) : null}
+      {isWalletConnected ? (
+        <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
+      ) : null}
     </Flex>
   );
 };

@@ -1,22 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-
-import { ChainID } from '@stacks/transactions';
-import { UseQueryOptions } from '@tanstack/react-query';
-import { RateLimiter } from 'limiter';
-import { fetcher as fetchApi } from '../utils/wrapped-fetch';
-
 // import { baseCurrencyAmountInQuote } from '@app/common/money/calculate-money';
 // import { useCryptoCurrencyMarketData } from '@app/query/common/market-data/market-data.hooks';
-import {
+import type {
   AddressTokenOfferingLocked,
-  Configuration,
   Middleware,
   RequestContext,
 } from '@stacks/blockchain-api-client';
+import { Configuration } from '@stacks/blockchain-api-client';
+import { ChainID } from '@stacks/transactions';
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
+import { RateLimiter } from 'limiter';
+import { useMemo } from 'react';
+
 import { StacksClient } from '../modules/stacks-client';
-import { Money } from '../utils/format-money';
+import type { Money } from '../utils/format-money';
+import { fetcher as fetchApi } from '../utils/wrapped-fetch';
 // import { i18nFormatCurrency } from '../utils/format-money';
 
 export function useStxAssetBalance(address: string) {
@@ -389,9 +388,3 @@ export function parseBalanceResponse(balances: AddressBalanceResponse) {
   };
   return { ...balances, stx };
 }
-
-
-
-
-
-

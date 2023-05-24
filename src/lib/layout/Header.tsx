@@ -1,7 +1,8 @@
 import { Box, Flex } from '@chakra-ui/react';
 
-import ThemeToggle from './ThemeToggle';
 import ConnectWallet from '../components/ConnectWallet';
+
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   return (

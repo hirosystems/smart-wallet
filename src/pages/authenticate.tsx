@@ -1,7 +1,7 @@
-
-import { Flex, Text, Box } from '@chakra-ui/react';
+import { Flex, Text, Box, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
+
 import ConnectWallet, { userSession } from '~/lib/components/ConnectWallet';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 
@@ -10,10 +10,11 @@ const Authenticate = () => {
   const router = useRouter();
 
   // Get the query parameter from the URL
-  const { address, contractAddress } = router.query;
-  console.log(address, contractAddress)
+  const { ownerAddress, contractAddress, txid } = router.query;
+  console.log(ownerAddress, contractAddress);
 
-  const { authenticate, isWalletConnected, mainnetAddress, disconnect } = useContext(HiroWalletContext);
+  const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
+    useContext(HiroWalletContext);
   console.log(isWalletConnected, mainnetAddress);
   return (
     <Flex
@@ -26,12 +27,19 @@ const Authenticate = () => {
       w="full"
     >
       <Box>
-        <Text fontSize="xl" fontWeight="bold">
-          Authenticate to intereact with contract {contractAddress}
-        </Text>
+        { !isWalletConnected ? <Text fontSize="xl" fontWeight="bold">
+          Authenticate to interact with contract {contractAddress}
+        </Text> : null }
+        { isWalletConnected ?
+          <Box>
+            <Text fontSize="xl" fontWeight="bold">
+              Confirm Transaction
+            </Text>
+            <Button m={2} onClick={() => console.log('confirm')}>Confirm Transaction</Button>
+          </Box>
+         : null }
       </Box>
-      <Box>
-      </Box>
+      <Box />
     </Flex>
   );
 };

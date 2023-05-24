@@ -10,7 +10,7 @@ function authenticate() {
   showConnect({
     appDetails: {
       name: 'Smart Wallet',
-      icon: window.location.origin + '/logo512.png',
+      icon: `${window.location.origin}/logo512.png`,
     },
     redirectTo: '/',
     onFinish: () => {

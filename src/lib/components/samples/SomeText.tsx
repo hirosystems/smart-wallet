@@ -6,7 +6,6 @@ const SomeText = () => {
       <Heading as="h1" size="lg">
         Smart Wallet
       </Heading>
-
     </Grid>
   );
 };

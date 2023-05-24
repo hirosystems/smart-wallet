@@ -1,9 +1,11 @@
-import { FungibleTokenMetadata } from '@stacks/blockchain-api-client';
+import type { FungibleTokenMetadata } from '@stacks/blockchain-api-client';
 import { getAssetStringParts } from '@stacks/ui-utils';
-import { useQueries, UseQueryResult } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { RateLimiter } from 'limiter';
+import type { RateLimiter } from 'limiter';
 import { useMemo } from 'react';
+
 import {
   createMoney,
   useAnchoredStacksAccountBalanceQuery,
@@ -11,9 +13,9 @@ import {
   useHiroApiRateLimiter,
   useStacksClientUnanchored,
 } from '../hooks/use-stx-balance';
-import { AccountBalanceResponseBigNumber } from '../models/account.model';
-import { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
-import { StacksClient } from '../modules/stacks-client';
+import type { AccountBalanceResponseBigNumber } from '../models/account.model';
+import type { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
+import type { StacksClient } from '../modules/stacks-client';
 import {
   formatContractId,
   isTransferableStacksFungibleTokenAsset,
@@ -98,7 +100,7 @@ const staleTime = 12 * 60 * 60 * 1000;
 const queryOptions = {
   keepPreviousData: true,
   cacheTime: staleTime,
-  staleTime: staleTime,
+  staleTime,
   refetchOnMount: false,
   refetchInterval: false,
   refetchOnReconnect: false,

@@ -1,5 +1,7 @@
 import { Stack } from '@chakra-ui/react';
-import { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
+
+import type { StacksFungibleTokenAssetBalance } from '../models/crypto-asset-balance.model';
+
 import { StacksFungibleTokenAssetItem } from './StacksFungibleTokenAssetItem';
 
 interface StacksFtCryptoAssetsProps {

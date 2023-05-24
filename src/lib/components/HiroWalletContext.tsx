@@ -1,14 +1,8 @@
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
-import {
-  createContext,
-  FC,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { AppConfig, showConnect, UserSession } from '@stacks/connect';
+import type { FC, ReactNode } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 
-const appConfig = new AppConfig(["store_write", "publish_data"]);
+const appConfig = new AppConfig(['store_write', 'publish_data']);
 export const userSession = new UserSession({ appConfig });
 
 interface HiroWallet {
@@ -48,10 +42,10 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
     setIsWalletOpen(true);
     showConnect({
       appDetails: {
-        name: "Hiro Platform",
+        name: 'Hiro Platform',
         icon: `${window.location.origin}/logo512.png`,
       },
-      redirectTo: "/",
+      redirectTo: '/',
       onFinish: () => {
         setIsWalletOpen(false);
         setIsWalletConnected(userSession.isUserSignedIn());

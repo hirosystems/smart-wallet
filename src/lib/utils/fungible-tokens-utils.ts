@@ -1,4 +1,5 @@
-import BigNumber from 'bignumber.js';
+import type BigNumber from 'bignumber.js';
+
 import { initBigNumber } from './number-utils';
 
 export const ftDecimals = (

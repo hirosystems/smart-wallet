@@ -1,5 +1,5 @@
-import { AccountBalanceStxKeys } from '../hooks/use-stx-balance';
-import { Money } from '../utils/format-money';
+import type { AccountBalanceStxKeys } from '../hooks/use-stx-balance';
+import type { Money } from '../utils/format-money';
 
 /**
  * This is a duplicated type from the types lib/generated API client
