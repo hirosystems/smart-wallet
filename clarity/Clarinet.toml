@@ -1,0 +1,25 @@
+[project]
+name = 'intellisign'
+description = ''
+authors = []
+telemetry = true
+cache_dir = './.cache'
+
+[[project.requirements]]
+contract_id = 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.nft-trait'
+
+[[project.requirements]]
+contract_id = 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard'
+[contracts.wallet]
+path = 'contracts/wallet.clar'
+clarity_version = 2
+epoch = 2.1
+
+[repl.analysis]
+# passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
