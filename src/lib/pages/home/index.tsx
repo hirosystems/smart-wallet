@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Box, CircularProgress, Flex, Text } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { useContext } from 'react';
@@ -11,8 +11,16 @@ const Home = () => {
   const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
     useContext(HiroWalletContext);
 
-  const { hasSmartWallet, isLoading, error } = useSmartWallet();
-  console.log('useSmartWallet', { hasSmartWallet, isLoading, error });
+  const {
+    hasSmartWallet,
+    isLoading: isSmartWalletLoading,
+    error,
+  } = useSmartWallet();
+  console.log('useSmartWallet', {
+    hasSmartWallet,
+    isSmartWalletLoading,
+    error,
+  });
   return (
     <Flex
       direction="column"
@@ -25,6 +33,15 @@ const Home = () => {
     >
       <NextSeo title="Home" />
       <Balances />
+      {isSmartWalletLoading ? (
+        <Box>
+          <CircularProgress isIndeterminate color="green.300" />
+        </Box>
+      ) : hasSmartWallet ? (
+        <Box>Deploy wallet</Box>
+      ) : (
+        <Box>Show wallet</Box>
+      )}
       <Text fontSize="xl" fontWeight="bold">
         With the Smart Wallet you add a layer of security to your STX tokens.
         With our 2 of 2 multisig wallet you can be sure that your tokens are

@@ -1,8 +1,7 @@
-import { Flex, Text, Box, Button } from '@chakra-ui/react';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 
-import ConnectWallet, { userSession } from '~/lib/components/ConnectWallet';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 
 const Authenticate = () => {
@@ -27,17 +26,21 @@ const Authenticate = () => {
       w="full"
     >
       <Box>
-        { !isWalletConnected ? <Text fontSize="xl" fontWeight="bold">
-          Authenticate to interact with contract {contractAddress}
-        </Text> : null }
-        { isWalletConnected ?
+        {!isWalletConnected ? (
+          <Text fontSize="xl" fontWeight="bold">
+            Authenticate to interact with contract {contractAddress}
+          </Text>
+        ) : null}
+        {isWalletConnected ? (
           <Box>
             <Text fontSize="xl" fontWeight="bold">
               Confirm Transaction
             </Text>
-            <Button m={2} onClick={() => console.log('confirm')}>Confirm Transaction</Button>
+            <Button m={2} onClick={() => console.log('confirm')}>
+              Confirm Transaction
+            </Button>
           </Box>
-         : null }
+        ) : null}
       </Box>
       <Box />
     </Flex>

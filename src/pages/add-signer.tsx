@@ -16,9 +16,8 @@ import {
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useContext, useState } from 'react';
 import Router from 'next/router';
-
+import { useContext, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 
@@ -68,7 +67,6 @@ function AddSigner() {
         setPhoneNumber('');
         // redirect to /send
         Router.push('/send');
-
       },
     }
   );
