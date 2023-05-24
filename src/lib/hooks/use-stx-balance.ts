@@ -206,18 +206,18 @@ export function useCurrentNetworkState() {
 export function useCurrentNetwork(): NetworkConfiguration {
   // return useSelector(selectCurrentNetwork);
   return {
-    name: 'mainnet',
-    id: 'mainnet',
+    name: 'testnet',
+    id: 'testnet',
     chain: {
       bitcoin: {
         blockchain: 'bitcoin',
-        url: 'https://stacks-node-api.mainnet.stacks.co',
-        network: 'mainnet',
+        url: 'https://stacks-node-api.testnet.stacks.co',
+        network: 'testnet',
       },
       stacks: {
         blockchain: 'stacks',
-        url: 'https://stacks-node-api.mainnet.stacks.co',
-        chainId: ChainID.Mainnet,
+        url: 'https://stacks-node-api.testnet.stacks.co',
+        chainId: ChainID.Testnet,
       },
     },
   };
