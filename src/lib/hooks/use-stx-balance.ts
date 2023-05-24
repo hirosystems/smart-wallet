@@ -1,21 +1,22 @@
-// import { baseCurrencyAmountInQuote } from '@app/common/money/calculate-money';
-// import { useCryptoCurrencyMarketData } from '@app/query/common/market-data/market-data.hooks';
-import type {
-  AddressTokenOfferingLocked,
-  Middleware,
-  RequestContext,
-} from '@stacks/blockchain-api-client';
-import { Configuration } from '@stacks/blockchain-api-client';
-import { ChainID } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
-import { RateLimiter } from 'limiter';
 import { useMemo } from 'react';
 
-import { StacksClient } from '../modules/stacks-client';
-import type { Money } from '../utils/format-money';
+import { ChainID } from '@stacks/transactions';
+import { UseQueryOptions } from '@tanstack/react-query';
+import { RateLimiter } from 'limiter';
 import { fetcher as fetchApi } from '../utils/wrapped-fetch';
+
+// import { baseCurrencyAmountInQuote } from '@app/common/money/calculate-money';
+// import { useCryptoCurrencyMarketData } from '@app/query/common/market-data/market-data.hooks';
+import {
+  AddressTokenOfferingLocked,
+  Configuration,
+  Middleware,
+  RequestContext
+} from '@stacks/blockchain-api-client';
+import BigNumber from 'bignumber.js';
+import { StacksClient } from '../modules/stacks-client';
+import { Money } from '../utils/format-money';
 // import { i18nFormatCurrency } from '../utils/format-money';
 
 export function useStxAssetBalance(address: string) {
@@ -204,6 +205,22 @@ export function useCurrentNetworkState() {
 
 export function useCurrentNetwork(): NetworkConfiguration {
   // return useSelector(selectCurrentNetwork);
+  // return {
+  //   name: 'mainnet',
+  //   id: 'mainnet',
+  //   chain: {
+  //     bitcoin: {
+  //       blockchain: 'bitcoin',
+  //       url: 'https://stacks-node-api.mainnet.stacks.co',
+  //       network: 'mainnet',
+  //     },
+  //     stacks: {
+  //       blockchain: 'stacks',
+  //       url: 'https://stacks-node-api.mainnet.stacks.co',
+  //       chainId: ChainID.Mainnet,
+  //     },
+  //   },
+  // };
   return {
     name: 'testnet',
     id: 'testnet',
@@ -388,3 +405,9 @@ export function parseBalanceResponse(balances: AddressBalanceResponse) {
   };
   return { ...balances, stx };
 }
+
+
+
+
+
+

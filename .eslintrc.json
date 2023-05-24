@@ -24,6 +24,7 @@
     "prefer-template": "warn",
     "@typescript-eslint/no-explicit-any": "off",
     "react/button-has-type": "off",
-    "@typescript-eslint/no-unused-vars": "off"
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-use-before-define": "off"
   }
 }

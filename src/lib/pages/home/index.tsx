@@ -1,14 +1,18 @@
-import { Button, Flex, Text } from '@chakra-ui/react';
-import Link from 'next/link';
+import { Flex, Text } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
+import Link from 'next/link';
 import { useContext } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 
 const Home = () => {
   const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
     useContext(HiroWalletContext);
+
+  const { hasSmartWallet, isLoading, error } = useSmartWallet();
+  console.log('useSmartWallet', { hasSmartWallet, isLoading, error });
   return (
     <Flex
       direction="column"
