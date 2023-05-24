@@ -30,6 +30,7 @@
     "@stacks/connect-react": "^21.0.1",
     "@stacks/network": "^6.1.0",
     "@stacks/transactions": "^6.1.0",
+    "@stacks/ui-utils": "^7.5.0",
     "@tanstack/react-query": "^4.29.7",
     "bignumber.js": "^9.1.1",
     "framer-motion": "^10.12.4",
@@ -39,12 +40,15 @@
     "next-seo": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0"
+    "react-icons": "^4.8.0",
+    "use-events": "^1.4.2",
+    "valid-url": "^1.0.9"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.6.1",
     "@commitlint/cz-commitlint": "^17.5.0",
     "@playwright/test": "^1.33.0",
+    "@stacks/stacks-blockchain-api-types": "^7.2.0",
     "@types/react": "^18.2.0",
     "commitizen": "^4.3.0",
     "commitlint": "^17.6.1",
