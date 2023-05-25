@@ -17,6 +17,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { StacksClient } from '../modules/stacks-client';
 import { Money } from '../utils/format-money';
+import { API_URL } from '../modules/constants';
 // import { i18nFormatCurrency } from '../utils/format-money';
 
 export function useStxAssetBalance(address: string) {
@@ -227,12 +228,12 @@ export function useCurrentNetwork(): NetworkConfiguration {
     chain: {
       bitcoin: {
         blockchain: 'bitcoin',
-        url: 'https://stacks-node-api.testnet.stacks.co',
+        url: API_URL,
         network: 'testnet',
       },
       stacks: {
         blockchain: 'stacks',
-        url: 'https://stacks-node-api.testnet.stacks.co',
+        url: API_URL,
         chainId: ChainID.Testnet,
       },
     },

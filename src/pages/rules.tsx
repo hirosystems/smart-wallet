@@ -33,7 +33,7 @@ import Router, { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
-import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME, API_URL } from '~/lib/modules/constants';
 import { cvToHex } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {
@@ -71,7 +71,7 @@ function Rules() {
       sender: testnetAddress,
       arguments: [],
     });
-    const url = `https://api.testnet.hiro.so/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-rules`;
+    const url = `${API_URL}/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-rules`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -92,7 +92,7 @@ function Rules() {
 
   function addSTXRule(amount) {
     doContractCall({
-      network: new StacksTestnet(),
+      network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
