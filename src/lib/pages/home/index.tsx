@@ -38,30 +38,47 @@ const Home = () => {
       w="full"
     >
       <NextSeo title="Home" />
+      <Text fontSize="xl" fontWeight="bold">
+        With the Smart Wallet you add a layer of security to your STX tokens.
+        With our 2 of 2 multisig wallet your can be sure that your tokens are
+        safe.
+      </Text>
       <Balances />
       {isSmartWalletLoading ? (
         <Box>
           <CircularProgress isIndeterminate color="green.300" />
         </Box>
-      ) : hasSmartWallet ? (
-        <Button onClick={navigateToCreateWallet}>Deploy wallet</Button>
+      ) : !hasSmartWallet && isWalletConnected ? (
+        <Button onClick={navigateToCreateWallet}>Deploy Smart Wallet</Button>
       ) : (
-        <Box>Show wallet</Box>
+        // <Box>Show wallet</Box>
+        null
       )}
-      <Text fontSize="xl" fontWeight="bold">
-        With the Smart Wallet you add a layer of security to your STX tokens.
-        With our 2 of 2 multisig wallet you can be sure that your tokens are
-        safe.
-      </Text>
       {!isWalletConnected ? (
-        <Link
-          as="Button"
-          href={{ pathname: '/authenticate', query: { address: '' } }}
-        >
-          Authenticate
-        </Link>
-      ) : null}
+        <Button className="Connect" onClick={authenticate}>
+          Connect Wallet
+        </Button>
+      ) : null }
       {isWalletConnected ? (
+        <Button>
+          <Link
+            href={{ pathname: '/add-signer'}}
+          >
+            Add Co-signer
+          </Link>
+        </Button>
+      ) : null}
+
+      {/* {!isWalletConnected ? (
+        <Button>
+          <Link
+            href={{ pathname: '/authenticate', query: { address: '' } }}
+          >
+            Authenticate
+          </Link>
+        </Button>
+      ) : null} */}
+      {isWalletConnected && hasSmartWallet ? (
         <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
       ) : null}
     </Flex>

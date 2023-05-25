@@ -10,6 +10,9 @@ dependencies:
   '@emotion/styled':
     specifier: ^11.10.6
     version: 11.10.6(@emotion/react@11.10.6)(@types/react@18.2.0)(react@18.2.0)
+  '@sendgrid/mail':
+    specifier: ^7.7.0
+    version: 7.7.0
   '@stacks/blockchain-api-client':
     specifier: ^7.2.0
     version: 7.2.0
@@ -2998,6 +3001,33 @@ packages:
     dependencies:
       '@noble/hashes': 1.1.5
       '@scure/base': 1.1.1
+    dev: false
+
+  /@sendgrid/client@7.7.0:
+    resolution: {integrity: sha512-SxH+y8jeAQSnDavrTD0uGDXYIIkFylCo+eDofVmZLQ0f862nnqbC3Vd1ej6b7Le7lboyzQF6F7Fodv02rYspuA==}
+    engines: {node: 6.* || 8.* || >=10.*}
+    dependencies:
+      '@sendgrid/helpers': 7.7.0
+      axios: 0.26.1
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@sendgrid/helpers@7.7.0:
+    resolution: {integrity: sha512-3AsAxfN3GDBcXoZ/y1mzAAbKzTtUZ5+ZrHOmWQ279AuaFXUNCh9bPnRpN504bgveTqoW+11IzPg3I0WVgDINpw==}
+    engines: {node: '>= 6.0.0'}
+    dependencies:
+      deepmerge: 4.3.1
+    dev: false
+
+  /@sendgrid/mail@7.7.0:
+    resolution: {integrity: sha512-5+nApPE9wINBvHSUxwOxkkQqM/IAAaBYoP9hw7WwgDNQPxraruVqHizeTitVtKGiqWCKm2mnjh4XGN3fvFLqaw==}
+    engines: {node: 6.* || 8.* || >=10.*}
+    dependencies:
+      '@sendgrid/client': 7.7.0
+      '@sendgrid/helpers': 7.7.0
+    transitivePeerDependencies:
+      - debug
     dev: false
 
   /@socket.io/component-emitter@3.1.0:

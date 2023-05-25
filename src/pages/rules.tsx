@@ -13,6 +13,7 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
+import { test } from '@playwright/test';
 import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
@@ -20,6 +21,7 @@ import {
   OptionalCV,
   PostConditionMode,
   bufferCVFromString,
+  serializeCV,
   someCV,
   stringUtf8CV,
   uintCV,
@@ -28,10 +30,11 @@ import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV
 import { getRecipientAddress } from '@stacks/ui-utils';
 import { useQuery } from '@tanstack/react-query';
 import Router, { useRouter } from 'next/router';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { cvToHex } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {
   return async () => {
@@ -42,14 +45,11 @@ function fetchSigners(userAddress) {
   };
 }
 
-function Send() {
+function Rules() {
   // get the params address
   const router = useRouter();
 
   const { doContractCall } = useConnect();
-  // Get the query parameter from the URL
-  const { address, contractAddress } = router.query;
-  console.log(address, contractAddress);
 
   const [amount, setAmount] = useState('1');
   const [recipientAddress, setRecipientAddress] = useState('ST2CEP848SACBBX7KHVC4TBZXBV0JH6SC0WF439NF');
@@ -65,35 +65,44 @@ function Send() {
   );
   console.log('data signers', signers);
 
-  function sendSTX(amount, recipientAddress) {
-    console.log('sendSTX', amount, recipientAddress);
+  async function getSTXRule() {
+    // const args = functionArgs.map(arg => cvToHex(arg));
+    const body = JSON.stringify({
+      sender: testnetAddress,
+      arguments: [],
+    });
+    const url = `https://api.testnet.hiro.so/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-rules`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  
+    return response.json();
+  }
+
+  useEffect(() => {
+    if (!testnetAddress) return;
+    getSTXRule()
+  }, [testnetAddress]);
+
+
+  function addSTXRule(amount) {
     doContractCall({
       network: new StacksTestnet(),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
-      functionName: 'transfer-stx',
-      functionArgs: [uintCV(amount), principalCV(recipientAddress), someCV(bufferCVFromString('test'))],
+      functionName: 'add-stx-rule',
+      functionArgs: [uintCV(amount)],
       postConditionMode: PostConditionMode.Deny,
       postConditions: [],
       onFinish: (data) => {
         console.log('onFinish:', data);
-        fetch('/api/send-message', {
-          method: 'POST',
-          body: JSON.stringify({
-            stxAddress: testnetAddress,
-            txId: data.txId,
-          }),
-        }).then((response) => response.json());
-         
-        // redirect to /pending
-        Router.push('/pending?txId=' + data.txId);
-
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            '_blank'
-          )
+       window.location.reload(); 
       },
       onCancel: () => {
         console.log('onCancel:', 'Transaction was canceled');
@@ -136,36 +145,27 @@ function Send() {
           </Table>
         </VStack>
       ) : null}
-      <Box>
+      <Box mt={8}>
         <Text fontSize="xl" fontWeight="bold">
-          Send STX, FT or NFT. For important transaction, your co-signer will be
-          notified to sign the transaction after you sign yours.
+          Add rules to secure your smart wallet for any STX, FT and NFT transfer. If a transaction satisfies any of
+          these rules, a notification will be sent to your co-signer for approval.
         </Text>
       </Box>
+      <br/>
+      <hr/>
       <Box width={'100%'}>
-        <FormLabel>Recipient Address</FormLabel>
+        <FormLabel>Minimum STX threshold that necessitates a co-signer for executing any transfer</FormLabel>
         <Input
-          placeholder="Amount"
-          onChange={(e) => setRecipientAddress(e.target.value)}
-          value={recipientAddress}
-        />
-        <FormLabel>STX Amount to transfer</FormLabel>
-        <Input
-          placeholder="Amount"
+          placeholder="10"
           onChange={(e) => setAmount(e.target.value)}
           value={amount}
         />
-        <Button m={2} onClick={() => sendSTX(amount, recipientAddress)}>
-          Send STX
+        <Button m={2} onClick={() => addSTXRule(amount)}>
+          Add rule
         </Button>
       </Box>
-      <Box>
-        <Button m={2}>Send FT</Button>
-        <Button m={2}>Send NFT</Button>
-      </Box>
-      <Box />
     </Flex>
   );
 }
 
-export default Send;
+export default Rules;

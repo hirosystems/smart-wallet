@@ -13,7 +13,7 @@ import defaultSEOConfig from '../../next-seo.config';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-console.log('envs', process.env);
+// console.log('envs', process.env);
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const queryClient = new QueryClient();

@@ -1,20 +1,64 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
+import { useConnect } from '@stacks/connect-react';
+import { StacksTestnet } from '@stacks/network';
+import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
+import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
+import { Router, useRouter } from 'next/router';
+import { GetServerSideProps } from 'next/types';
 import { useContext } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { signers } from './api/store';
+
+export const getServerSideProps: GetServerSideProps<{
+  repo: any;
+}> = async () => {
+  return { props: { signers } };
+};
 
 const Authenticate = () => {
   // get the params address
   const router = useRouter();
 
+  const { doContractCall } = useConnect();
   // Get the query parameter from the URL
   const { ownerAddress, contractAddress, txid } = router.query;
   console.log(ownerAddress, contractAddress);
 
-  const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
+  const { isWalletConnected, mainnetAddress } =
     useContext(HiroWalletContext);
   console.log(isWalletConnected, mainnetAddress);
+  function cosignTx(txId) {
+    doContractCall({
+      network: new StacksTestnet(),
+      anchorMode: AnchorMode.Any,
+      contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
+      contractName: SMART_WALLET_CONTRACT_NAME,
+      functionName: 'cosign-tx',
+      functionArgs: [uintCV(txId)],
+      postConditionMode: PostConditionMode.Deny,
+      postConditions: [],
+      onFinish: (data) => {
+        console.log('onFinish:', data);
+        fetch('/api/send-owner-notification', {
+          method: 'POST',
+          body: JSON.stringify({
+            stxAddress: ownerAddress,
+            txId: data.txId,
+          }),
+        }).then((response) => response.json());
+        window
+          .open(
+            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
+            '_blank'
+          )
+      },
+      onCancel: () => {
+        console.log('onCancel:', 'Transaction was canceled');
+      },
+    });
+  }
   return (
     <Flex
       direction="column"
@@ -36,9 +80,17 @@ const Authenticate = () => {
             <Text fontSize="xl" fontWeight="bold">
               Confirm Transaction
             </Text>
-            <Button m={2} onClick={() => console.log('confirm')}>
-              Confirm Transaction
+            <Button m={2} onClick={() => cosignTx(txid)}>
+              Confirm Transaction {txid}
             </Button>
+            <Text>
+              <a
+                href={`https://explorer.hiro.so/txid/${txid}?chain=testnet`}
+                target="_blank"
+              > 
+                View Transaction
+              </a>
+            </Text>
           </Box>
         ) : null}
       </Box>

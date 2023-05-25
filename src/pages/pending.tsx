@@ -13,13 +13,12 @@ function fetchSigners(userAddress) {
   };
 }
 
-function Send() {
+function Pending() {
   // get the params address
   const router = useRouter();
 
-  const { doContractCall } = useConnect();
   // Get the query parameter from the URL
-  const { txid } = router.query;
+  const { txId } = router.query;
 
   return (
     <Flex
@@ -33,11 +32,12 @@ function Send() {
     >
       <Box>
         <Text fontSize="xl" fontWeight="bold">
-          Waiting for your co-signer to sign the transaction.
+          Waiting for your co-signer to sign the transaction {txId}.
+          You will be notified by email and sms when the co-signer has signed the transaction.
         </Text>
       </Box>
     </Flex>
   );
 }
 
-export default Send;
+export default Pending;

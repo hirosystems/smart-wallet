@@ -15,11 +15,24 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import Router from 'next/router';
 import { useContext, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { signers } from './api/store';
+import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { StacksTestnet } from '@stacks/network';
+import { AnchorMode, PostConditionMode } from '@stacks/transactions';
+import { useConnect } from '@stacks/connect-react';
+import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
+
+export const getServerSideProps: GetServerSideProps<{
+  repo: any;
+}> = async () => {
+  return { props: { signers } };
+};
 
 function fetchSigners(userAddress) {
   return async () => {
@@ -40,7 +53,8 @@ function addSignerMutation(userAddress, address, email, phoneNumber) {
   };
 }
 
-function AddSigner() {
+function AddSigner(props) {
+  console.log('props', props);
   const [stxAddress, setStxAddress] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -54,8 +68,10 @@ function AddSigner() {
       enabled: !!testnetAddress,
     }
   );
+  const { doContractCall } = useConnect();
 
   console.log('signers', signers);
+
 
   const mutation = useMutation(
     addSignerMutation(testnetAddress, stxAddress, email, phoneNumber),
@@ -71,9 +87,29 @@ function AddSigner() {
     }
   );
 
+  function callContractAddSigner(principal) {
+    console.log('callContractaddSigner', principal);
+    doContractCall({
+      network: new StacksTestnet(),
+      anchorMode: AnchorMode.Any,
+      contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
+      contractName: SMART_WALLET_CONTRACT_NAME,
+      functionName: 'add-signer',
+      functionArgs: [principalCV(principal)],
+      postConditionMode: PostConditionMode.Deny,
+      postConditions: [],
+      onFinish: (data) => {
+        console.log('onFinish:', data);
+        mutation.mutate();
+      },
+      onCancel: () => {
+        console.log('onCancel:', 'Transaction was canceled');
+      },
+    });
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate();
+    callContractAddSigner(stxAddress);
   };
 
   // if (!mainnetAddress) {
@@ -123,7 +159,7 @@ function AddSigner() {
               <br />
             </Text>
           </Box>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{'width': '100%'}}>
             <FormControl id="stxAddress" isRequired>
               <FormLabel>STX Address</FormLabel>
               <Input
@@ -163,3 +199,4 @@ function AddSigner() {
 }
 
 export default AddSigner;
+

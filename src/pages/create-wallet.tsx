@@ -21,7 +21,7 @@ function fetchSigners(userAddress) {
 }
 
 async function saveWalletOwnerMutation(formData) {
-  const response = await fetch('/api/save-wallet-owner-info', {
+  const response = await fetch('/api/save-owner-info', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
@@ -53,6 +53,7 @@ async function deployWallet() {
 }
 
 function createWallet() {
+  const { testnetAddress } = useContext(HiroWalletContext);
   const {
     register,
     handleSubmit,
@@ -63,7 +64,7 @@ function createWallet() {
   const onSubmit = async (data) => {
     try {
       console.log(data);
-      await saveWalletOwnerMutation(data);
+      await saveWalletOwnerMutation({ ...data, userAddress: testnetAddress });
     } catch (error) {
       console.error('Error during form submission: ', error);
     }
@@ -73,7 +74,7 @@ function createWallet() {
   console.log({ errors, isSubmitted });
 
   const deployWalletOnClickHandler = useCallback(() => {
-    const deployWallet = async () => {
+    const deployWalletAsync = async () => {
       // for mainnet, use `StacksMainnet()`
       const txId = await deployWallet();
       window.open(
@@ -81,9 +82,9 @@ function createWallet() {
         '_blank'
       );
 
-      router.push('/');
+      router.push('/add-signer');
     };
-    deployWallet();
+    deployWalletAsync();
   }, [router]);
 
   return (

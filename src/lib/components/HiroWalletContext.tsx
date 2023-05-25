@@ -42,7 +42,7 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
     setIsWalletOpen(true);
     showConnect({
       appDetails: {
-        name: 'Hiro Platform',
+        name: 'Hiro Smart Wallet',
         icon: `${window.location.origin}/logo512.png`,
       },
       redirectTo: '/',
