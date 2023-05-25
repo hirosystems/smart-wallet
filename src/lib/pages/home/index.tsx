@@ -50,25 +50,19 @@ const Home = () => {
         </Box>
       ) : !hasSmartWallet && isWalletConnected ? (
         <Button onClick={navigateToCreateWallet}>Deploy Smart Wallet</Button>
-      ) : (
-        // <Box>Show wallet</Box>
-        null
-      )}
+      ) : // <Box>Show wallet</Box>
+      null}
       {!isWalletConnected ? (
         <Button className="Connect" onClick={authenticate}>
           Connect Wallet
         </Button>
-      ) : null }
+      ) : null}
       {isWalletConnected ? (
         <Button>
-          <Link
-            href={{ pathname: '/add-signer'}}
-          >
-            Add Co-signer
-          </Link>
+          <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
         </Button>
       ) : null}
-
+      {hasSmartWallet ? <Button>Deposit STX</Button> : null}
       {/* {!isWalletConnected ? (
         <Button>
           <Link
