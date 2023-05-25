@@ -1,5 +1,6 @@
-import { Stack } from '@chakra-ui/react';
+import { Box, Stack } from '@chakra-ui/react';
 import { useContext } from 'react';
+import { useSmartWallet } from '../hooks/use-smart-wallet';
 
 import { useStxAssetBalance } from '../hooks/use-stx-balance';
 import { SMART_WALLET_CONTRACT_ADDRESS_2 } from '../modules/constants';
@@ -11,16 +12,24 @@ import StxBalance from './StxBalance';
 
 export const Balances = () => {
   const { currentAddress } = useContext(HiroWalletContext);
+  const {
+    hasSmartWallet,
+    isLoading: isSmartWalletLoading,
+    error,
+  } = useSmartWallet();
   if (!currentAddress) return null;
   const { stxAssetBalance: hiroWalletStxAssetBalance } =
     useStxAssetBalance(currentAddress);
   const hiroWalletStacksFtAssetBalances =
     useStacksFungibleTokenAssetBalancesAnchoredWithMetadata(currentAddress);
 
-  const { stxAssetBalance: smartWalletStxAssetBalance } =
-    useStxAssetBalance(SMART_WALLET_CONTRACT_ADDRESS_2);
+  const { stxAssetBalance: smartWalletStxAssetBalance } = useStxAssetBalance(
+    SMART_WALLET_CONTRACT_ADDRESS_2
+  );
   const smartWalletStacksFtAssetBalances =
-    useStacksFungibleTokenAssetBalancesAnchoredWithMetadata(SMART_WALLET_CONTRACT_ADDRESS_2);
+    useStacksFungibleTokenAssetBalancesAnchoredWithMetadata(
+      SMART_WALLET_CONTRACT_ADDRESS_2
+    );
 
   return (
     <Stack border="1px solid white" padding="30px">
@@ -30,10 +39,16 @@ export const Balances = () => {
         assetBalances={hiroWalletStacksFtAssetBalances}
       />
       <h3>Smart Wallet Balances</h3>
-      <StxBalance stxAssetBalance={smartWalletStxAssetBalance} />
-      <StacksFungibleTokenAssetList
-        assetBalances={smartWalletStacksFtAssetBalances}
-      />
+      {hasSmartWallet ? (
+        <>
+          <StxBalance stxAssetBalance={smartWalletStxAssetBalance} />
+          <StacksFungibleTokenAssetList
+            assetBalances={smartWalletStacksFtAssetBalances}
+          />
+        </>
+      ) : (
+        <Box>No Smart Wallet Deployed</Box>
+      )}
     </Stack>
   );
 };

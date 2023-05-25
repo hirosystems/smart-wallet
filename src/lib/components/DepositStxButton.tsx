@@ -7,7 +7,7 @@ import { API_URL, SMART_WALLET_CONTRACT_ADDRESS_2 } from '../modules/constants';
 import { openTxLink } from '../utils/transactions-utils';
 import HiroWalletContext from './HiroWalletContext';
 
-export const DepositStxButton = (amount: number) => {
+export const DepositStx = () => {
   const network = useCurrentNetwork();
   const { testnetAddress, devnetAddress, mainnetAddress } =
     useContext(HiroWalletContext);
