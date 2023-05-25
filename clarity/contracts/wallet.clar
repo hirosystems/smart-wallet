@@ -16,8 +16,12 @@
 ;;
 
 ;; Error codes
-(define-constant ERR_TOO_MANY_SIGNERS (err u100))
-(define-constant ERR_TOO_MANY_RULES (err u101))
+(define-constant ERR_TOO_MANY_SIGNERS     (err u100))
+(define-constant ERR_TOO_MANY_RULES       (err u101))
+(define-constant ERR_PERMISSION_DENIED    (err u102))
+(define-constant ERR_TX_NOT_FOUND         (err u103))
+(define-constant ERR_ALREADY_SIGNED       (err u104))
+(define-constant ERR_TOO_MANY_PENDING_TXS (err u105))
 
 ;; Rule kinds
 ;; limits the amount of STX that can be transferred
@@ -42,10 +46,13 @@
 (define-data-var next-rule-id uint u0)
 
 ;; List of cosigners that can approve transactions
-(define-data-var cosigners (list 4 principal) (list))
+(define-data-var cosigners (list 4 principal) (list tx-sender))
 
 ;; Next identifier to use for a pending transaction
 (define-data-var next-tx-id uint u0)
+
+;; Add list of outstanding txids
+(define-data-var pending-txids (list 64 uint) (list))
 
 ;; data maps
 ;;
@@ -64,7 +71,7 @@
 
 ;; Transactions waiting for cosigners
 (define-map pending-txs
-  uint 
+  uint
   {
     ;; contract that will be called; none indicates an STX transfer
     contract: (optional principal),
@@ -81,52 +88,64 @@
 
 (define-public (add-signer (signer principal))
   (let ((signers (var-get cosigners)))
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
     (ok (var-set cosigners (unwrap! (as-max-len? (append signers signer) u4) ERR_TOO_MANY_SIGNERS)))
   )
 )
 
 (define-public (remove-signer (signer principal))
-  ;; (var-set cosigners (get filtered (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)})))
-  (ok (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)}))
+  (begin
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    ;; (var-set cosigners (get filtered (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)})))
+    (ok (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)}))
+  )
 )
 
 ;; STX transfer
 (define-public (transfer-stx (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
-  ;; check if this transaction requires a cosigner
-  (if
-    (get requires-cosign
-      (fold apply-stx-rule
-        (var-get rules)
-        { amount: amount, recipient: recipient, requires-cosign: false }
+  (begin
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+
+    ;; check if this transaction requires a cosigner
+    (if
+      (get requires-cosign
+        (fold apply-stx-rule
+          (var-get rules)
+          { amount: amount, recipient: recipient, requires-cosign: false }
+        )
       )
-    )
-    (let ((txid (var-get next-tx-id)))
-      (var-set next-tx-id (+ txid u1))
-      (map-set pending-txs txid
-        {
-          contract: none,
-          recipient: recipient,
-          amount-or-id: amount,
-          memo: opt-memo,
-          owner: tx-sender,
-          cosigners: (list),
-        }
+      ;; cosigner required, return pending transaction
+      (let ((txid (var-get next-tx-id)))
+        (var-set next-tx-id (+ txid u1))
+        (var-set pending-txids (unwrap! (as-max-len? (append (var-get pending-txids) txid) u64) ERR_TOO_MANY_PENDING_TXS))
+        (map-set pending-txs txid
+          {
+            contract: none,
+            recipient: recipient,
+            amount-or-id: amount,
+            memo: opt-memo,
+            owner: tx-sender,
+            cosigners: (list),
+          }
+        )
+        (ok { pending: (some txid), result: none })
       )
-      (ok { pending: (some txid), result: none })
+      ;; no co-signer required; execute transfer
+      (ok {
+        pending: none,
+        result: (some (match opt-memo
+          memo (as-contract (stx-transfer-memo? amount tx-sender recipient memo))
+          (as-contract (stx-transfer? amount tx-sender recipient))
+        ))
+      })
     )
-    (ok {
-      pending: none,
-      result: (some (match opt-memo
-        memo (as-contract (stx-transfer-memo? amount tx-sender recipient memo))
-        (as-contract (stx-transfer? amount tx-sender recipient))
-      ))
-    })
   )
 )
 
 ;; SIP-009 transfer
 ;; (define-public (transfer-nft (asset-contract <nft-trait>) (id uint) (recipient principal) (opt-memo (optional (buff 34))))
 ;;   (begin
+;;     (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
 ;;     (if (is-some opt-memo) (print (unwrap-panic opt-memo)) 0x)            
 ;;     (as-contract (contract-call? asset-contract transfer id tx-sender recipient))
 ;;   )
@@ -134,12 +153,29 @@
 
 ;; SIP-010 transfer
 ;; (define-public (transfer-ft (asset-contract <ft-trait>) (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
-;;   (as-contract (contract-call? asset-contract transfer amount tx-sender recipient opt-memo))
+;;   (begin
+;;     (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+;;     (as-contract (contract-call? asset-contract transfer amount tx-sender recipient opt-memo))
+;;   )
 ;; )
 
 ;; Co-sign an existing STX transfer
 (define-public (cosign-stx (txid uint))
-  (ok { pending: none, result: none })
+  (let ((pending (unwrap! (map-get? pending-txs txid) ERR_TX_NOT_FOUND))
+        (recipient (get recipient pending))
+        (amount (get amount-or-id pending))
+        (opt-memo (get memo pending)))
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-none (index-of? (get cosigners pending) tx-sender)) ERR_ALREADY_SIGNED)
+    (var-set pending-txids (filter-uint txid (var-get pending-txids)))
+    (ok {
+      pending: none,
+      result: (some (match (get memo pending)
+        memo (as-contract (stx-transfer-memo? (get amount-or-id pending) tx-sender (get recipient pending) memo))
+        (as-contract (stx-transfer? amount tx-sender recipient))
+      ))
+    })
+  )
 )
 
 ;; Co-sign an existing NFT transfer
@@ -158,6 +194,7 @@
       (rule-id (var-get next-rule-id))
       (rule { id: rule-id, kind: STX_RULE, asset: none, amount-or-id: amount-or-id })
       (saved-rules (var-get rules)))
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
     (var-set rules (unwrap! (as-max-len? (append saved-rules rule) u64) ERR_TOO_MANY_RULES))
     (var-set next-rule-id (+ rule-id u1))
     (map-set rule-indices rule-id (len saved-rules))
@@ -177,6 +214,7 @@
         (list rule-id)
       ))
     )
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
     (var-set rules (unwrap! (as-max-len? (append saved-rules rule) u64) ERR_TOO_MANY_RULES))
     (var-set next-rule-id (+ rule-id u1))
     (map-set rule-indices rule-id (len saved-rules))
@@ -192,12 +230,21 @@
 
 (define-read-only (get-signers) (var-get cosigners))
 
-(define-read-only (get-rules)
-  (var-get rules)
+(define-read-only (get-rules) (var-get rules))
+
+(define-read-only (get-pending-txids) (var-get pending-txids))
+
+(define-read-only (get-pending-txs)
+  (map get-pending-tx (var-get pending-txids))
 )
 
 ;; private functions
 ;;
+
+;; Check if p is an authorized signer
+(define-private (is-signer (p principal))
+  (is-some (index-of? (var-get cosigners) p))
+)
 
 ;; Filter a signer from a list of signers
 (define-private (filter-signer (signer principal) (data { to-remove: principal, filtered: (list 4 principal)}))
@@ -205,6 +252,23 @@
     data
     { to-remove: (get to-remove data), filtered: (unwrap-panic (as-max-len? (append (get filtered data) signer) u4)) }
   )
+)
+
+;; Filter a uint from a list of uints
+(define-private (filter-uint (n uint) (from (list 64 uint)))
+  (get filtered (fold filter-uint-inner from { to-remove: n, filtered: (list)}))
+)
+
+(define-private (filter-uint-inner (n uint) (data { to-remove: uint, filtered: (list 64 uint)}))
+  (if (is-eq n (get to-remove data))
+    data
+    { to-remove: (get to-remove data), filtered: (unwrap-panic (as-max-len? (append (get filtered data) n) u64)) }
+  )
+)
+
+;; Retrieve a pending transaction by its txid
+(define-private (get-pending-tx (txid uint))
+  (merge {txid: txid} (unwrap-panic (map-get? pending-txs txid)))
 )
 
 ;; Apply a rule to an STX transfer
