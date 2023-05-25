@@ -10,7 +10,7 @@ import { useCallback, useContext } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { smartWalletContract } from '~/lib/contracts/wallet-contract';
-import { API_URL } from '~/lib/modules/constants';
+import { API_URL, EXPLORER_URL } from '~/lib/modules/constants';
 import { SMART_WALLET_CONTRACT_NAME } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {
@@ -78,10 +78,7 @@ function createWallet() {
     const deployWalletAsync = async () => {
       // for mainnet, use `StacksMainnet()`
       const txId = await deployWallet();
-      window.open(
-        `https://explorer.hiro.so/txid/${txId}?chain=testnet`,
-        '_blank'
-      );
+      window.open(`${EXPLORER_URL}/txid/${txId}?chain=testnet`, '_blank');
 
       router.push('/add-signer');
     };

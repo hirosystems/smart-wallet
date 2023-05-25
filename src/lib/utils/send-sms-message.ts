@@ -1,6 +1,6 @@
 import twilio from 'twilio';
 
-import { APP_URL } from '../modules/constants';
+import { APP_URL, EXPLORER_URL } from '../modules/constants';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const apiKey = process.env.TWILIO_API_KEY;
@@ -44,5 +44,5 @@ export const bodyNotifyOwner = (
   coSignerAddress: string,
   txId: string
 ) => {
-  return `Your transaction https://explorer.hiro.so/txid/${txId} made with address ${ownerStxAddress}?chain=testnet has been signed by ${coSignerAddress}.`
+  return `Your transaction ${EXPLORER_URL}/txid/${txId} made with address ${ownerStxAddress}?chain=testnet has been signed by ${coSignerAddress}.`
 };

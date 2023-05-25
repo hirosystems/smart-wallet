@@ -33,6 +33,7 @@ import { useContext, useState } from 'react';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import {
   API_URL,
+  EXPLORER_URL,
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
 } from '~/lib/modules/constants';
@@ -56,7 +57,9 @@ function Send() {
   console.log(address, contractAddress);
 
   const [amount, setAmount] = useState('1');
-  const [recipientAddress, setRecipientAddress] = useState('ST2CEP848SACBBX7KHVC4TBZXBV0JH6SC0WF439NF');
+  const [recipientAddress, setRecipientAddress] = useState(
+    'ST2CEP848SACBBX7KHVC4TBZXBV0JH6SC0WF439NF'
+  );
   const { testnetAddress } = useContext(HiroWalletContext);
 
   // get the co-signer data
@@ -77,7 +80,11 @@ function Send() {
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
       functionName: 'transfer-stx',
-      functionArgs: [uintCV(amount), principalCV(recipientAddress), someCV(bufferCVFromString('test'))],
+      functionArgs: [
+        uintCV(amount),
+        principalCV(recipientAddress),
+        someCV(bufferCVFromString('test')),
+      ],
       postConditionMode: PostConditionMode.Deny,
       postConditions: [],
       onFinish: (data) => {
@@ -89,15 +96,14 @@ function Send() {
             txId: data.txId,
           }),
         }).then((response) => response.json());
-         
+
         // redirect to /pending
         Router.push('/pending?txId=' + data.txId);
 
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            '_blank'
-          )
+        window.open(
+          `${EXPLORER_URL}/txid/${data.txId}?chain=testnet`,
+          '_blank'
+        );
       },
       onCancel: () => {
         console.log('onCancel:', 'Transaction was canceled');

@@ -5,3 +5,4 @@ export const CONNECT_AUTH_ORIGIN = '/';
 
 export const APP_URL = 'http://localhost:3000';
 export const API_URL = 'http://localhost:3999';
+export const EXPLORER_URL = 'http://localhost:8000';
