@@ -39,6 +39,9 @@
 ;; data vars
 ;;
 
+;; Owner of this wallet. Only the owner can initiate transactions
+(define-data-var owner principal tx-sender)
+
 ;; List of rules that apply to this wallet
 (define-data-var rules (list 64 { id: uint, kind: uint, asset: (optional principal), amount-or-id: uint }) (list))
 
@@ -46,7 +49,7 @@
 (define-data-var next-rule-id uint u0)
 
 ;; List of cosigners that can approve transactions
-(define-data-var cosigners (list 4 principal) (list tx-sender))
+(define-data-var cosigners (list 4 principal) (list))
 
 ;; Next identifier to use for a pending transaction
 (define-data-var next-tx-id uint u0)
@@ -88,14 +91,14 @@
 
 (define-public (add-signer (signer principal))
   (let ((signers (var-get cosigners)))
-    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
     (ok (var-set cosigners (unwrap! (as-max-len? (append signers signer) u4) ERR_TOO_MANY_SIGNERS)))
   )
 )
 
 (define-public (remove-signer (signer principal))
   (begin
-    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
     ;; (var-set cosigners (get filtered (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)})))
     (ok (fold filter-signer (var-get cosigners) { to-remove: signer, filtered: (list)}))
   )
@@ -104,7 +107,7 @@
 ;; STX transfer
 (define-public (transfer-stx (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
   (begin
-    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
 
     ;; check if this transaction requires a cosigner
     (if
@@ -145,7 +148,7 @@
 ;; SIP-009 transfer
 ;; (define-public (transfer-nft (asset-contract <nft-trait>) (id uint) (recipient principal) (opt-memo (optional (buff 34))))
 ;;   (begin
-;;     (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+;;     (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
 ;;     (if (is-some opt-memo) (print (unwrap-panic opt-memo)) 0x)            
 ;;     (as-contract (contract-call? asset-contract transfer id tx-sender recipient))
 ;;   )
@@ -154,7 +157,7 @@
 ;; SIP-010 transfer
 ;; (define-public (transfer-ft (asset-contract <ft-trait>) (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
 ;;   (begin
-;;     (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+;;     (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
 ;;     (as-contract (contract-call? asset-contract transfer amount tx-sender recipient opt-memo))
 ;;   )
 ;; )
@@ -189,12 +192,12 @@
 )
 
 ;; Add an STX rule to the wallet
-(define-public (add-stx-rule (amount-or-id uint))
+(define-public (add-stx-rule (amount uint))
   (let (
       (rule-id (var-get next-rule-id))
-      (rule { id: rule-id, kind: STX_RULE, asset: none, amount-or-id: amount-or-id })
+      (rule { id: rule-id, kind: STX_RULE, asset: none, amount-or-id: amount })
       (saved-rules (var-get rules)))
-    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
     (var-set rules (unwrap! (as-max-len? (append saved-rules rule) u64) ERR_TOO_MANY_RULES))
     (var-set next-rule-id (+ rule-id u1))
     (map-set rule-indices rule-id (len saved-rules))
@@ -214,7 +217,7 @@
         (list rule-id)
       ))
     )
-    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
     (var-set rules (unwrap! (as-max-len? (append saved-rules rule) u64) ERR_TOO_MANY_RULES))
     (var-set next-rule-id (+ rule-id u1))
     (map-set rule-indices rule-id (len saved-rules))
@@ -244,6 +247,10 @@
 ;; Check if p is an authorized signer
 (define-private (is-signer (p principal))
   (is-some (index-of? (var-get cosigners) p))
+)
+
+(define-private (is-owner (p principal))
+  (is-eq p (var-get owner))
 )
 
 ;; Filter a signer from a list of signers

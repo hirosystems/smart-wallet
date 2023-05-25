@@ -33,7 +33,7 @@ Clarinet.test({
       [],
       deployer.address
     );
-    assertEquals(result.result, `[${deployer.address}, ${wallet1.address}]`);
+    assertEquals(result.result, `[${wallet1.address}]`);
   },
 });
 
