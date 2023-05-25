@@ -10,6 +10,7 @@ import { useCallback, useContext } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { smartWalletContract } from '~/lib/contracts/wallet-contract';
+import { API_URL, EXPLORER_URL } from '~/lib/modules/constants';
 import { SMART_WALLET_CONTRACT_NAME } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {
@@ -31,7 +32,12 @@ async function saveWalletOwnerMutation(formData) {
 
 async function deployWallet(address: string) {
   // for mainnet, use `StacksMainnet()`
+<<<<<<< HEAD
   const network = new StacksTestnet();
+=======
+  const network = new StacksTestnet({ url: API_URL });
+  const { testnetAddress, mainnetAddress } = useContext(HiroWalletContext);
+>>>>>>> main
 
   if (!address) {
     throw new Error('No testnet address found');

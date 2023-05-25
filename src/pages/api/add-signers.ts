@@ -1,5 +1,5 @@
 import {
-  bodyNotifyAsCoSigner,
+  bodyNotifyAsCoSigner, sendSmsMessage,
 } from '~/lib/utils/send-sms-message';
 
 import { signers } from './store';
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   console.log('signers', signers);
   // Send sms to the second signer
   const body = bodyNotifyAsCoSigner(userAddress, address);
-  // const smsMessage = await sendSmsMessage(phoneNumber, body);
+  const smsMessage = await sendSmsMessage(phoneNumber, body);
   const emailMessage = await sendEmailMessage(email, body);
 
   res.status(200).json({

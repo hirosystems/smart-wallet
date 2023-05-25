@@ -9,6 +9,7 @@ import {
 
 import {
   CONNECT_AUTH_ORIGIN,
+  EXPLORER_URL,
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
 } from './constants';
@@ -30,10 +31,7 @@ export function callSmartWalletContract(
       console.log('onFinish:', data);
       if (!data?.txId) return;
       window
-        .open(
-          `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-          '_blank'
-        )
+        .open(`${EXPLORER_URL}/txid/${data.txId}?chain=testnet`, '_blank')
         .focus();
     },
     onCancel: () => {

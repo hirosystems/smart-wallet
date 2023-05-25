@@ -1,13 +1,6 @@
 import { ChainID } from '@stacks/transactions';
 import { useMemo } from 'react';
-import { useCurrentNetwork } from './use-current-network';
-
-export enum DefaultNetworkModes {
-  mainnet = 'mainnet',
-  testnet = 'testnet',
-}
-
-export type NetworkModes = keyof typeof DefaultNetworkModes;
+import { DefaultNetworkModes, useCurrentNetwork } from './use-current-network';
 
 export function useCurrentNetworkState() {
   const currentNetwork = useCurrentNetwork(); // TODO: hardcode mainnet for now. Try using react redux to test it out

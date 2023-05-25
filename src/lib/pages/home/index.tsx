@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useContext } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
+import { DepositStxButton } from '~/lib/components/DepositStxButton';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 
@@ -62,7 +63,7 @@ const Home = () => {
           <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
         </Button>
       ) : null}
-      {hasSmartWallet ? <Button>Deposit STX</Button> : null}
+      {hasSmartWallet ? <DepositStxButton /> : null}
       {/* {!isWalletConnected ? (
         <Button>
           <Link

@@ -8,7 +8,11 @@ import { GetServerSideProps } from 'next/types';
 import { useContext } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
-import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import {
+  EXPLORER_URL,
+  SMART_WALLET_CONTRACT_ADDRESS,
+  SMART_WALLET_CONTRACT_NAME,
+} from '~/lib/modules/constants';
 import { signers } from './api/store';
 
 export const getServerSideProps: GetServerSideProps<{
@@ -26,12 +30,11 @@ const Authenticate = () => {
   const { ownerAddress, contractAddress, txid } = router.query;
   console.log(ownerAddress, contractAddress);
 
-  const { isWalletConnected, mainnetAddress } =
-    useContext(HiroWalletContext);
+  const { isWalletConnected, mainnetAddress } = useContext(HiroWalletContext);
   console.log(isWalletConnected, mainnetAddress);
   function cosignTx(txId) {
     doContractCall({
-      network: new StacksTestnet(),
+      network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
@@ -48,11 +51,10 @@ const Authenticate = () => {
             txId: data.txId,
           }),
         }).then((response) => response.json());
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            '_blank'
-          )
+        window.open(
+          `${EXPLORER_URL}/txid/${data.txId}?chain=testnet`,
+          '_blank'
+        );
       },
       onCancel: () => {
         console.log('onCancel:', 'Transaction was canceled');
@@ -85,9 +87,9 @@ const Authenticate = () => {
             </Button>
             <Text>
               <a
-                href={`https://explorer.hiro.so/txid/${txid}?chain=testnet`}
+                href={`${EXPLORER_URL}/txid/${txid}?chain=testnet`}
                 target="_blank"
-              > 
+              >
                 View Transaction
               </a>
             </Text>

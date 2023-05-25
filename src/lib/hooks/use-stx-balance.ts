@@ -15,7 +15,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { StacksClient } from '../modules/stacks-client';
 import { Money } from '../utils/format-money';
-import { useCurrentNetworkState, NetworkModes } from './use-current-network-state';
+import { useCurrentNetworkState } from './use-current-network-state';
 
 export function useStxAssetBalance(address: string) {
   //   const stxMarketData = useCryptoCurrencyMarketData('STX');
@@ -188,41 +188,6 @@ const balanceQueryOptions = {
   keepPreviousData: false,
   refetchOnMount: true,
 } as const;
-
-export interface NetworkConfiguration {
-  name: string;
-  id: DefaultNetworkConfigurations;
-  chain: {
-    bitcoin: BitcoinChainConfig;
-    stacks: StacksChainConfig;
-  };
-}
-
-export type DefaultNetworkConfigurations =
-  keyof typeof DefaultNetworkConfigurationIds;
-
-interface BaseChainConfig {
-  blockchain: Blockchains;
-}
-export type Blockchains = 'bitcoin' | 'stacks';
-
-interface BitcoinChainConfig extends BaseChainConfig {
-  blockchain: 'bitcoin';
-  url: string;
-  network: NetworkModes;
-}
-
-interface StacksChainConfig extends BaseChainConfig {
-  blockchain: 'stacks';
-  url: string;
-  chainId: ChainID;
-}
-
-export enum DefaultNetworkConfigurationIds {
-  mainnet = 'mainnet',
-  testnet = 'testnet',
-  devnet = 'devnet',
-}
 
 // export const MICROBLOCKS_ENABLED = !IS_TEST_ENV && true;
 export const MICROBLOCKS_ENABLED = true;
