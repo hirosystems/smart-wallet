@@ -1,6 +1,7 @@
 import { Button, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
-import { StacksTestnet } from '@stacks/network';
+import { StacksNetwork, StacksTestnet } from '@stacks/network';
+import { AnchorMode } from '@stacks/transactions';
 import { useContext, useState } from 'react';
 import { useCurrentNetwork } from '../hooks/use-current-network';
 import { API_URL, SMART_WALLET_CONTRACT_ADDRESS_2 } from '../modules/constants';
@@ -22,10 +23,13 @@ export const DepositStx = () => {
       amount: (parseInt(inputAmount) * 1000000).toString(),
       recipient: SMART_WALLET_CONTRACT_ADDRESS_2,
       network: new StacksTestnet({ url: API_URL }), //network.id,
+      memo: 'A memo',
+      anchorMode: AnchorMode.Any,
       onFinish: (data) => {
         const { txId } = data;
         console.log('doSTXTransfer onFinish', data);
         openTxLink(txId, network.id);
+        setInputAmount('');
       },
       onCancel: () => {
         console.log('doSTXTransfer onCancel');

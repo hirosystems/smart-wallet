@@ -101,6 +101,6 @@ const networkDevnet: NetworkConfiguration = {
 
 export function useCurrentNetwork(): NetworkConfiguration {
   //   return networkMainnet;
-  return networkTestnet;
-  //   return networkDevnet;
+  // return networkTestnet;
+    return networkDevnet;
 }

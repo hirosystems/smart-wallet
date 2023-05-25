@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useContext } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
-import { DepositStx } from '~/lib/components/DepositStxButton';
+import { DepositStx } from '~/lib/components/DepositStx';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 
