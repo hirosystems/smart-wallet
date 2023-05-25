@@ -44,7 +44,7 @@ function fetchSigners(userAddress) {
 
 function addSignerMutation(userAddress, address, email, phoneNumber) {
   return async () => {
-    const response = await fetch('/api/add-signer', {
+    const response = await fetch('/api/add-signers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address, userAddress, email, phoneNumber }),
