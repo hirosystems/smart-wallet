@@ -1,0 +1,1 @@
+export const SMART_WALLET_CONTRACT_NAME = 'smart-wallet-v001';

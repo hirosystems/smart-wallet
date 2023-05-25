@@ -1,7 +1,8 @@
-import { Box, CircularProgress, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, CircularProgress, Flex, Text } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
-import { useContext } from 'react';
+import { useRouter } from 'next/router';
+import { useCallback, useContext } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
@@ -10,6 +11,11 @@ import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 const Home = () => {
   const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
     useContext(HiroWalletContext);
+  const router = useRouter();
+
+  const navigateToCreateWallet = useCallback(() => {
+    router.push('/create-wallet');
+  }, [router]);
 
   const {
     hasSmartWallet,
@@ -38,7 +44,7 @@ const Home = () => {
           <CircularProgress isIndeterminate color="green.300" />
         </Box>
       ) : hasSmartWallet ? (
-        <Box>Deploy wallet</Box>
+        <Button onClick={navigateToCreateWallet}>Deploy wallet</Button>
       ) : (
         <Box>Show wallet</Box>
       )}

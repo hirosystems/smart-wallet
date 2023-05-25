@@ -1,5 +1,6 @@
 import type { AddressTransactionsListResponse } from '@stacks/blockchain-api-client';
 import { useQuery } from '@tanstack/react-query';
+import { SMART_WALLET_CONTRACT_NAME } from '../utils/smart-wallet-utils';
 
 import { useStacksClientUnanchored } from './use-stx-balance';
 
@@ -27,7 +28,7 @@ const checkTransactionsForSmartWalletDeploy = (
   transactions: AddressTransactionsListResponse
 ): boolean => {
   console.log({ transactions });
-  const smartWalletName = 'smart-wallet-v001';
+  const smartWalletName = SMART_WALLET_CONTRACT_NAME;
   for (const tx of transactions.results as any[]) {
     // TODO: these need to be typed
     if (tx.tx_type === 'smart_contract') {

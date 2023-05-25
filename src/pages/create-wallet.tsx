@@ -5,9 +5,12 @@ import {
   broadcastTransaction,
   makeContractDeploy,
 } from '@stacks/transactions';
-import { readFileSync } from 'fs';
 import { useRouter } from 'next/router';
+import { useCallback, useContext } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { smartWalletContract } from '~/lib/contracts/wallet-contract';
+import { SMART_WALLET_CONTRACT_NAME } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {
   return async () => {
@@ -17,34 +20,36 @@ function fetchSigners(userAddress) {
   };
 }
 
-function addSignerMutation(userAddress, address, email, phoneNumber) {
-  return async () => {
-    const response = await fetch('/api/add-signer', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address, userAddress, email, phoneNumber }),
-    });
-    return response.json();
-  };
+async function saveWalletOwnerMutation(formData) {
+  const response = await fetch('/api/save-wallet-owner-info', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+  return response.json();
 }
 
-function deployWallet() {
+async function deployWallet() {
   // for mainnet, use `StacksMainnet()`
   const network = new StacksTestnet();
+  const { testnetAddress, mainnetAddress } = useContext(HiroWalletContext);
+
+  if (!testnetAddress) {
+    throw new Error('No testnet address found');
+  }
 
   const txOptions = {
-    contractName: 'contract_name',
-    codeBody: readFileSync('/path/to/contract.clar').toString(),
-    senderKey:
-      'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
+    contractName: SMART_WALLET_CONTRACT_NAME,
+    codeBody: smartWalletContract.source,
+    senderKey: testnetAddress, // TODO: hardcoded for now
     network,
     anchorMode: AnchorMode.Any,
   };
 
   const transaction = await makeContractDeploy(txOptions);
-
   const broadcastResponse = await broadcastTransaction(transaction, network);
-  const txId = broadcastResponse.txid;
+  return broadcastResponse.txid;
+  // TODO: save txId to DB?
 }
 
 function createWallet() {
@@ -55,8 +60,31 @@ function createWallet() {
     formState: { errors, isSubmitted },
     control,
   } = useForm();
-  const onSubmit = (data) => console.log(data); // TODO: submit to API
+  const onSubmit = async (data) => {
+    try {
+      console.log(data);
+      await saveWalletOwnerMutation(data);
+    } catch (error) {
+      console.error('Error during form submission: ', error);
+    }
+  };
   const router = useRouter();
+
+  console.log({ errors, isSubmitted });
+
+  const deployWalletOnClickHandler = useCallback(() => {
+    const deployWallet = async () => {
+      // for mainnet, use `StacksMainnet()`
+      const txId = await deployWallet();
+      window.open(
+        `https://explorer.hiro.so/txid/${txId}?chain=testnet`,
+        '_blank'
+      );
+
+      router.push('/');
+    };
+    deployWallet();
+  }, [router]);
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
@@ -65,15 +93,15 @@ function createWallet() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box>
           <Controller
-            name="Email"
+            name="email"
             control={control}
             defaultValue=""
             rules={{
               required: 'Email is required',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                message: 'Invalid email address',
-              },
+              //   pattern: {
+              //     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+              //     message: 'Invalid email address',
+              //   },
             }}
             render={({ field }) => (
               <>
@@ -83,15 +111,15 @@ function createWallet() {
             )}
           />
           <Controller
-            name="Phone Number"
+            name="phoneNumber"
             control={control}
             defaultValue=""
             rules={{
               required: 'Email is required',
-              pattern: {
-                value: /^[0-9]+$/,
-                message: 'Invalid phone number',
-              },
+              //   pattern: {
+              //     value: /^[0-9]+$/,
+              //     message: 'Invalid phone number',
+              //   },
             }}
             render={({ field }) => (
               <>
@@ -113,7 +141,10 @@ function createWallet() {
             }
             hasArrow
           >
-            <Button isDisabled={!isSubmitted} onClick={deployWallet}>
+            <Button
+              isDisabled={!isSubmitted}
+              onClick={deployWalletOnClickHandler}
+            >
               Deploy Smart Wallet
             </Button>
           </Tooltip>

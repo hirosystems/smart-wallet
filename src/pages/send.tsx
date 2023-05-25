@@ -1,18 +1,33 @@
-import { Flex, Text, Box, Button, Input, Table, Tbody, Td, Th, Thead, Tr, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  VStack,
+} from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
-import { AnchorMode, stringUtf8CV, PostConditionMode } from '@stacks/transactions';
-import { useRouter } from 'next/router';
-import Router from 'next/router';
-import { useContext, useState } from 'react';
+import {
+  AnchorMode,
+  PostConditionMode,
+  stringUtf8CV,
+} from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
+import Router, { useRouter } from 'next/router';
+import { useContext, useState } from 'react';
 
-import ConnectWallet, { userSession } from '~/lib/components/ConnectWallet';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 
 function fetchSigners(userAddress) {
   return async () => {
-    if (!userAddress) return
+    if (!userAddress) return;
     const response = await fetch(`/api/get-signers?userAddress=${userAddress}`);
     const data = await response.json();
     return data.data.signers;
@@ -39,7 +54,7 @@ function Send() {
       enabled: !!testnetAddress,
     }
   );
-  console.log('data signers', signers)
+  console.log('data signers', signers);
 
   function sendSTX(pick: any) {
     doContractCall({
@@ -59,8 +74,8 @@ function Send() {
           body: JSON.stringify({
             phoneNumber: '+14155552671', // TODO
             stxAddress: testnetAddress,
-          })
-        }).then((response) => response.json())
+          }),
+        }).then((response) => response.json());
 
         window
           .open(
@@ -68,8 +83,8 @@ function Send() {
             '_blank'
           )
           .focus();
-          // redirect to /pending
-          Router.push('/pending?txId=' + data.txId);
+        // redirect to /pending
+        Router.push('/pending?txId=' + data.txId);
       },
       onCancel: () => {
         console.log('onCancel:', 'Transaction was canceled');
@@ -114,12 +129,19 @@ function Send() {
       ) : null}
       <Box>
         <Text fontSize="xl" fontWeight="bold">
-          Send STX, FT or NFT. For important transaction, you co-signer will be notified to sign the transaction after you sign yours.
+          Send STX, FT or NFT. For important transaction, you co-signer will be
+          notified to sign the transaction after you sign yours.
         </Text>
       </Box>
       <Box>
-        <Input placeholder="Amount" onChange={(e) => setAmount(e.target.value)} value={amount}/>
-        <Button m={2} onClick={() => sendSTX('🍊')}>Send STX</Button>
+        <Input
+          placeholder="Amount"
+          onChange={(e) => setAmount(e.target.value)}
+          value={amount}
+        />
+        <Button m={2} onClick={() => sendSTX('🍊')}>
+          Send STX
+        </Button>
       </Box>
       <Box>
         <Button m={2}>Send FT</Button>
