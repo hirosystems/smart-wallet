@@ -33,7 +33,11 @@ import Router, { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
-import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME, API_URL } from '~/lib/modules/constants';
+import {
+  SMART_WALLET_CONTRACT_ADDRESS,
+  SMART_WALLET_CONTRACT_NAME,
+  API_URL,
+} from '~/lib/modules/constants';
 import { cvToHex } from '~/lib/utils/smart-wallet-utils';
 
 function fetchSigners(userAddress) {

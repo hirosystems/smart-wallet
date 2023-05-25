@@ -22,7 +22,11 @@ import { useContext, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { signers } from './api/store';
-import { API_URL, SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import {
+  API_URL,
+  SMART_WALLET_CONTRACT_ADDRESS,
+  SMART_WALLET_CONTRACT_NAME,
+} from '~/lib/modules/constants';
 import { StacksTestnet } from '@stacks/network';
 import { AnchorMode, PostConditionMode } from '@stacks/transactions';
 import { useConnect } from '@stacks/connect-react';
@@ -72,7 +76,6 @@ function AddSigner(props) {
 
   console.log('signers', signers);
 
-
   const mutation = useMutation(
     addSignerMutation(testnetAddress, stxAddress, email, phoneNumber),
     {
@@ -90,7 +93,7 @@ function AddSigner(props) {
   function callContractAddSigner(principal) {
     console.log('callContractaddSigner', principal);
     doContractCall({
-      network: new StacksTestnet( {url: API_URL }),
+      network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,

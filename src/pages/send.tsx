@@ -31,7 +31,11 @@ import Router, { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
-import { SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import {
+  API_URL,
+  SMART_WALLET_CONTRACT_ADDRESS,
+  SMART_WALLET_CONTRACT_NAME,
+} from '~/lib/modules/constants';
 
 function fetchSigners(userAddress) {
   return async () => {
