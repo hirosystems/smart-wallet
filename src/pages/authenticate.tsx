@@ -31,7 +31,7 @@ const Authenticate = () => {
   console.log(isWalletConnected, mainnetAddress);
   function cosignTx(txId) {
     doContractCall({
-      network: new StacksTestnet(),
+      network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,

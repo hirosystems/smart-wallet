@@ -3,12 +3,13 @@ import twilio from 'twilio';
 import { APP_URL } from '../modules/constants';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const apiKey = process.env.TWILIO_API_KEY;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 export const sendSmsMessage = async (
   phoneNumber: string,
   body: string
 ) => {
-  const client = twilio(accountSid, authToken);
+  const client = twilio(apiKey, authToken, {accountSid: accountSid });
 
   try {
     const message = await client.messages.create({
