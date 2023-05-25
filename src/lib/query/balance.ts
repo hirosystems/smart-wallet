@@ -5,11 +5,11 @@ import { useQueries } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import type { RateLimiter } from 'limiter';
 import { useMemo } from 'react';
+import { useCurrentNetworkState } from '../hooks/use-current-network-state';
 
 import {
   createMoney,
   useAnchoredStacksAccountBalanceQuery,
-  useCurrentNetworkState,
   useHiroApiRateLimiter,
   useStacksClientUnanchored,
 } from '../hooks/use-stx-balance';

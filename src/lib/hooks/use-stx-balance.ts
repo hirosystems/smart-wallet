@@ -6,19 +6,16 @@ import { UseQueryOptions } from '@tanstack/react-query';
 import { RateLimiter } from 'limiter';
 import { fetcher as fetchApi } from '../utils/wrapped-fetch';
 
-// import { baseCurrencyAmountInQuote } from '@app/common/money/calculate-money';
-// import { useCryptoCurrencyMarketData } from '@app/query/common/market-data/market-data.hooks';
 import {
   AddressTokenOfferingLocked,
   Configuration,
   Middleware,
-  RequestContext
+  RequestContext,
 } from '@stacks/blockchain-api-client';
 import BigNumber from 'bignumber.js';
 import { StacksClient } from '../modules/stacks-client';
 import { Money } from '../utils/format-money';
-import { API_URL } from '../modules/constants';
-// import { i18nFormatCurrency } from '../utils/format-money';
+import { useCurrentNetworkState } from './use-current-network-state';
 
 export function useStxAssetBalance(address: string) {
   //   const stxMarketData = useCryptoCurrencyMarketData('STX');
@@ -192,96 +189,6 @@ const balanceQueryOptions = {
   refetchOnMount: true,
 } as const;
 
-export function useCurrentNetworkState() {
-  const currentNetwork = useCurrentNetwork(); // TODO: hardcode mainnet for now. Try using react redux to test it out
-
-  return useMemo(() => {
-    const isTestnet = currentNetwork.chain.stacks.chainId === ChainID.Testnet;
-    const mode = isTestnet
-      ? DefaultNetworkModes.testnet
-      : DefaultNetworkModes.mainnet;
-    return { ...currentNetwork, isTestnet, mode };
-  }, [currentNetwork]);
-}
-
-export function useCurrentNetwork(): NetworkConfiguration {
-  // return useSelector(selectCurrentNetwork);
-  // return {
-  //   name: 'mainnet',
-  //   id: 'mainnet',
-  //   chain: {
-  //     bitcoin: {
-  //       blockchain: 'bitcoin',
-  //       url: 'https://stacks-node-api.mainnet.stacks.co',
-  //       network: 'mainnet',
-  //     },
-  //     stacks: {
-  //       blockchain: 'stacks',
-  //       url: 'https://stacks-node-api.mainnet.stacks.co',
-  //       chainId: ChainID.Mainnet,
-  //     },
-  //   },
-  // };
-  return {
-    name: 'testnet',
-    id: 'testnet',
-    chain: {
-      bitcoin: {
-        blockchain: 'bitcoin',
-        url: API_URL,
-        network: 'testnet',
-      },
-      stacks: {
-        blockchain: 'stacks',
-        url: API_URL,
-        chainId: ChainID.Testnet,
-      },
-    },
-  };
-}
-
-export interface NetworkConfiguration {
-  name: string;
-  id: DefaultNetworkConfigurations;
-  chain: {
-    bitcoin: BitcoinChainConfig;
-    stacks: StacksChainConfig;
-  };
-}
-
-export type DefaultNetworkConfigurations =
-  keyof typeof DefaultNetworkConfigurationIds;
-
-interface BaseChainConfig {
-  blockchain: Blockchains;
-}
-export type Blockchains = 'bitcoin' | 'stacks';
-
-interface BitcoinChainConfig extends BaseChainConfig {
-  blockchain: 'bitcoin';
-  url: string;
-  network: NetworkModes;
-}
-
-interface StacksChainConfig extends BaseChainConfig {
-  blockchain: 'stacks';
-  url: string;
-  chainId: ChainID;
-}
-
-export enum DefaultNetworkConfigurationIds {
-  mainnet = 'mainnet',
-  testnet = 'testnet',
-  devnet = 'devnet',
-}
-
-export enum DefaultNetworkModes {
-  mainnet = 'mainnet',
-  testnet = 'testnet',
-}
-
-export type NetworkModes = keyof typeof DefaultNetworkModes;
-
 // export const MICROBLOCKS_ENABLED = !IS_TEST_ENV && true;
 export const MICROBLOCKS_ENABLED = true;
 
@@ -406,9 +313,3 @@ export function parseBalanceResponse(balances: AddressBalanceResponse) {
   };
   return { ...balances, stx };
 }
-
-
-
-
-
-

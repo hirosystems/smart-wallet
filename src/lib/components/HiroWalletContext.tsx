@@ -1,6 +1,7 @@
 import { AppConfig, showConnect, UserSession } from '@stacks/connect';
 import type { FC, ReactNode } from 'react';
 import { createContext, useCallback, useEffect, useState } from 'react';
+import { useCurrentNetwork } from '../hooks/use-current-network';
 
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 export const userSession = new UserSession({ appConfig });
@@ -10,6 +11,8 @@ interface HiroWallet {
   isWalletConnected: boolean;
   testnetAddress: string | null;
   mainnetAddress: string | null;
+  devnetAddress: string | null;
+  currentAddress: string | null;
   authenticate: () => void;
   disconnect: () => void;
 }
@@ -19,6 +22,8 @@ const HiroWalletContext = createContext<HiroWallet>({
   isWalletConnected: false,
   testnetAddress: null,
   mainnetAddress: null,
+  devnetAddress: null,
+  currentAddress: null,
   authenticate: () => {},
   disconnect: () => {},
 });
@@ -37,6 +42,7 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
     setIsWalletConnected(mounted && userSession.isUserSignedIn());
   }, [mounted]);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const network = useCurrentNetwork();
 
   const authenticate = useCallback(() => {
     setIsWalletOpen(true);
@@ -67,6 +73,13 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
   const mainnetAddress = isWalletConnected
     ? userSession.loadUserData().profile.stxAddress.mainnet
     : null;
+  // TODO: stacksjs needs to add support for devnet addresses
+  const devnetAddress = isWalletConnected
+    ? userSession.loadUserData().profile.stxAddress.devnet ||
+      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'
+    : null;
+
+  const currentAddress = network.id === 'testnet' ? testnetAddress : network.id === 'mainnet' ? mainnetAddress : devnetAddress;
 
   return (
     <HiroWalletContext.Provider
@@ -77,6 +90,8 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
         isWalletConnected,
         testnetAddress,
         mainnetAddress,
+        devnetAddress,
+        currentAddress,
       }}
     >
       {children}

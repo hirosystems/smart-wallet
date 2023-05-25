@@ -30,19 +30,23 @@ async function saveWalletOwnerMutation(formData) {
   return response.json();
 }
 
-async function deployWallet() {
+async function deployWallet(address: string) {
   // for mainnet, use `StacksMainnet()`
+<<<<<<< HEAD
+  const network = new StacksTestnet();
+=======
   const network = new StacksTestnet({ url: API_URL });
   const { testnetAddress, mainnetAddress } = useContext(HiroWalletContext);
+>>>>>>> main
 
-  if (!testnetAddress) {
+  if (!address) {
     throw new Error('No testnet address found');
   }
 
   const txOptions = {
     contractName: SMART_WALLET_CONTRACT_NAME,
     codeBody: smartWalletContract.source,
-    senderKey: testnetAddress, // TODO: hardcoded for now
+    senderKey: address, // TODO: hardcoded for now
     network,
     anchorMode: AnchorMode.Any,
   };
@@ -74,11 +78,14 @@ function createWallet() {
 
   console.log({ errors, isSubmitted });
 
-  const deployWalletOnClickHandler = useCallback(() => {
+  const deployWalletOnClickHandler = useCallback((testnetAddress: string) => {
     const deployWalletAsync = async () => {
       // for mainnet, use `StacksMainnet()`
-      const txId = await deployWallet();
-      window.open(`${EXPLORER_URL}/txid/${txId}?chain=testnet`, '_blank');
+      const txId = await deployWallet(testnetAddress);
+      window.open(
+        `https://explorer.hiro.so/txid/${txId}?chain=testnet`,
+        '_blank'
+      );
 
       router.push('/add-signer');
     };
@@ -142,7 +149,7 @@ function createWallet() {
           >
             <Button
               isDisabled={!isSubmitted}
-              onClick={deployWalletOnClickHandler}
+              onClick={() => deployWalletOnClickHandler(testnetAddress)}
             >
               Deploy Smart Wallet
             </Button>

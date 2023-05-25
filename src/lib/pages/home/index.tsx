@@ -1,10 +1,19 @@
-import { Box, Button, CircularProgress, Flex, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Flex,
+  Heading,
+  HStack,
+  Text,
+} from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useContext } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
+import { DepositStx } from '~/lib/components/DepositStx';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 
@@ -36,9 +45,11 @@ const Home = () => {
       gap={4}
       mb={8}
       w="full"
+      border="1px solid white"
+      padding="30px"
     >
       <NextSeo title="Home" />
-      <Text fontSize="xl" fontWeight="bold">
+      <Text fontSize="xl" fontWeight="bold" textAlign="center">
         With the Smart Wallet you add a layer of security to your STX tokens.
         With our 2 of 2 multisig wallet your can be sure that your tokens are
         safe.
@@ -50,22 +61,11 @@ const Home = () => {
         </Box>
       ) : !hasSmartWallet && isWalletConnected ? (
         <Button onClick={navigateToCreateWallet}>Deploy Smart Wallet</Button>
-      ) : (
-        // <Box>Show wallet</Box>
-        null
-      )}
+      ) : // <Box>Show wallet</Box>
+      null}
       {!isWalletConnected ? (
         <Button className="Connect" onClick={authenticate}>
           Connect Wallet
-        </Button>
-      ) : null }
-      {isWalletConnected ? (
-        <Button>
-          <Link
-            href={{ pathname: '/add-signer'}}
-          >
-            Add Co-signer
-          </Link>
         </Button>
       ) : null}
 
@@ -78,9 +78,19 @@ const Home = () => {
           </Link>
         </Button>
       ) : null} */}
-      {isWalletConnected && hasSmartWallet ? (
-        <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
-      ) : null}
+      <Box>
+        <Heading>Smart Wallet Actions</Heading>
+        <Flex>
+          <HStack>
+            {isWalletConnected && hasSmartWallet ? (
+              <Button>
+                <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
+              </Button>
+            ) : null}
+            {hasSmartWallet ? <DepositStx /> : null}
+          </HStack>
+        </Flex>
+      </Box>
     </Flex>
   );
 };
