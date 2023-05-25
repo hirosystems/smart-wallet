@@ -1,5 +1,5 @@
 import {
-  bodyNotifyAsCoSigner,
+  bodyNotifyAsCoSigner, sendSmsMessage,
 } from '~/lib/utils/send-sms-message';
 
 import { signers } from './store';
