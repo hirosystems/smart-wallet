@@ -143,6 +143,12 @@ function Rules() {
       mb={8}
       w="full"
     >
+      <Box mt={8}>
+        <Text fontSize="xl" fontWeight="bold">
+          Add rules to secure your smart wallet for any STX, FT and NFT transfer. If a transaction satisfies any of
+          these rules, a notification will be sent to your co-signer for approval.
+        </Text>
+      </Box>
       {stxRules && stxRules?.length > 0 ? (
         <>
         <Text>Active Rules</Text>
@@ -196,12 +202,6 @@ function Rules() {
           </Table>
         </VStack>
       ) : null}
-      <Box mt={8}>
-        <Text fontSize="xl" fontWeight="bold">
-          Add rules to secure your smart wallet for any STX, FT and NFT transfer. If a transaction satisfies any of
-          these rules, a notification will be sent to your co-signer for approval.
-        </Text>
-      </Box>
       <br/>
       <hr/>
       <Box width={'100%'}>
