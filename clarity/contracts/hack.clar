@@ -2,7 +2,7 @@
 (impl-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; Define the FT, with no maximum supply
-(define-fungible-token clarity-coin)
+(define-fungible-token hacker-coin)
 
 ;; Define errors
 (define-constant ERR_OWNER_ONLY (err u100))
@@ -18,12 +18,12 @@
 
 ;; SIP-010 function: Get the token balance of a specified principal
 (define-read-only (get-balance (who principal))
-  (ok (ft-get-balance clarity-coin who))
+  (ok (ft-get-balance hacker-coin who))
 )
 
 ;; SIP-010 function: Returns the total supply of fungible token
 (define-read-only (get-total-supply)
-  (ok (ft-get-supply clarity-coin))
+  (ok (ft-get-supply hacker-coin))
 )
 
 ;; SIP-010 function: Returns the human-readable token name
@@ -51,7 +51,7 @@
 (define-public (mint (amount uint) (recipient principal))
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_OWNER_ONLY)
-    (ft-mint? clarity-coin amount recipient)
+    (ft-mint? hacker-coin amount recipient)
   )
 )
 
@@ -66,7 +66,7 @@
   (begin
     ;; #[filter(amount, recipient)]
     (asserts! (is-eq tx-sender sender) ERR_NOT_TOKEN_OWNER)
-    (try! (ft-transfer? clarity-coin amount sender recipient))
+    (try! (ft-transfer? hacker-coin amount sender recipient))
     (match memo to-print (print to-print) 0x)
     (ok true)
   )
@@ -74,5 +74,6 @@
 
 ;; Initialize some accounts with balances (including the wallet contract)
 (mint u100000000 .wallet)
+(mint u100000000 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (mint u100000000 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)
 (mint u100000000 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG)

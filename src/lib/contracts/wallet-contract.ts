@@ -2,8 +2,9 @@ import { SMART_WALLET_CONTRACT_NAME } from '../modules/constants';
 
 // this needs to be kept in sync with the smart wallet contract in clarity/contracts/wallet.clar
 export const smartWalletContract = {
-  name: SMART_WALLET_CONTRACT_NAME + '1', // TODO: use uuid
-  source: `;; title: IntelliSign Wallet
+  name: SMART_WALLET_CONTRACT_NAME,
+  source: `
+;; title: IntelliSign Wallet
 ;; version: 0.1
 ;; summary: Smart Wallet
 ;; description:
@@ -13,8 +14,8 @@ export const smartWalletContract = {
 
 ;; traits
 ;;
-(use-trait nft-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.nft-trait.nft-trait)
-(use-trait ft-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait nft-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-trait.nft-trait)
+(use-trait ft-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
@@ -26,6 +27,9 @@ export const smartWalletContract = {
 (define-constant ERR_TX_NOT_FOUND         (err u103))
 (define-constant ERR_ALREADY_SIGNED       (err u104))
 (define-constant ERR_TOO_MANY_PENDING_TXS (err u105))
+(define-constant ERR_INVALID_TX_TYPE      (err u106))
+(define-constant ERR_CONTRACT_MISMATCH    (err u107))
+(define-constant ERR_INTERNAL             (err u999))
 
 ;; Rule kinds
 ;; limits the amount of STX that can be transferred
@@ -150,21 +154,89 @@ export const smartWalletContract = {
 )
 
 ;; SIP-009 transfer
-;; (define-public (transfer-nft (asset-contract <nft-trait>) (id uint) (recipient principal) (opt-memo (optional (buff 34))))
-;;   (begin
-;;     (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
-;;     (if (is-some opt-memo) (print (unwrap-panic opt-memo)) 0x)            
-;;     (as-contract (contract-call? asset-contract transfer id tx-sender recipient))
-;;   )
-;; )
+(define-public (transfer-nft (asset-contract <nft-trait>) (id uint) (recipient principal) (opt-memo (optional (buff 34))))
+  (let ((contract-rules (map-get? nft-rules (contract-of asset-contract))))
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
+
+    ;; check if this transaction requires a cosigner
+    (if
+      (and
+        (is-some contract-rules)
+        (get requires-cosign
+          (fold apply-nft-rule
+            (map get-rule (unwrap-panic contract-rules))
+            { asset-contract: (contract-of asset-contract), id: id, recipient: recipient, requires-cosign: false }
+          )
+        )
+      )
+      ;; cosigner required, return pending transaction
+      (let ((txid (var-get next-tx-id)))
+        (var-set next-tx-id (+ txid u1))
+        (var-set pending-txids (unwrap! (as-max-len? (append (var-get pending-txids) txid) u64) ERR_TOO_MANY_PENDING_TXS))
+        (map-set pending-txs txid
+          {
+            contract: (some (contract-of asset-contract)),
+            recipient: recipient,
+            amount-or-id: id,
+            memo: opt-memo,
+            owner: tx-sender,
+            cosigners: (list),
+          }
+        )
+        (ok { pending: (some txid), result: none })
+      )
+      ;; no co-signer required; execute transfer
+      (ok {
+        pending: none,
+        result: (some (begin
+          (if (is-some opt-memo) (print (unwrap-panic opt-memo)) 0x)
+          (as-contract (contract-call? asset-contract transfer id tx-sender recipient))
+        ))
+      })
+    )
+  )
+)
 
 ;; SIP-010 transfer
-;; (define-public (transfer-ft (asset-contract <ft-trait>) (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
-;;   (begin
-;;     (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
-;;     (as-contract (contract-call? asset-contract transfer amount tx-sender recipient opt-memo))
-;;   )
-;; )
+(define-public (transfer-ft (asset-contract <ft-trait>) (amount uint) (recipient principal) (opt-memo (optional (buff 34))))
+  (let ((contract-rules (map-get? ft-rules (contract-of asset-contract))))
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
+
+    ;; check if this transaction requires a cosigner
+    (if
+      (and
+        (is-some contract-rules)
+        (get requires-cosign
+          (fold apply-ft-rule
+            (map get-rule (unwrap-panic contract-rules))
+            { asset-contract: (contract-of asset-contract), amount: amount, recipient: recipient, requires-cosign: false }
+          )
+        )
+      )
+      ;; cosigner required, return pending transaction
+      (let ((txid (var-get next-tx-id)))
+        (var-set next-tx-id (+ txid u1))
+        (var-set pending-txids (unwrap! (as-max-len? (append (var-get pending-txids) txid) u64) ERR_TOO_MANY_PENDING_TXS))
+        (map-set pending-txs txid
+          {
+            contract: (some (contract-of asset-contract)),
+            recipient: recipient,
+            amount-or-id: amount,
+            memo: opt-memo,
+            owner: tx-sender,
+            cosigners: (list),
+          }
+        )
+        (ok { pending: (some txid), result: none })
+      )
+      ;; no co-signer required; execute transfer
+      (ok {
+        pending: none,
+        result: (some (as-contract (contract-call? asset-contract transfer amount tx-sender recipient opt-memo)))
+      })
+    )
+  )
+)
 
 ;; Co-sign an existing STX transfer
 (define-public (cosign-stx (txid uint))
@@ -187,12 +259,50 @@ export const smartWalletContract = {
 
 ;; Co-sign an existing NFT transfer
 (define-public (cosign-nft (txid uint) (nft <nft-trait>))
-  (ok { pending: none, result: none })
+    (let ((pending (unwrap! (map-get? pending-txs txid) ERR_TX_NOT_FOUND))
+        (saved-contract (unwrap! (get contract pending) ERR_INVALID_TX_TYPE))
+        (recipient (get recipient pending))
+        (amount (get amount-or-id pending))
+        (opt-memo (get memo pending)))
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-none (index-of? (get cosigners pending) tx-sender)) ERR_ALREADY_SIGNED)
+    (asserts! (is-eq (contract-of nft) saved-contract) ERR_CONTRACT_MISMATCH)
+    (var-set pending-txids (filter-uint txid (var-get pending-txids)))
+    (ok {
+      pending: none,
+      result: (some (begin
+          (if (is-some (get memo pending)) (print (unwrap-panic opt-memo)) 0x)
+          (as-contract (contract-call? nft transfer
+            (get amount-or-id pending)
+            tx-sender
+            (get recipient pending)
+          ))))
+    })
+  )
 )
 
 ;; Co-sign an existing FT transfer
 (define-public (cosign-ft (txid uint) (ft <ft-trait>))
-  (ok { pending: none, result: none })
+  (let ((pending (unwrap! (map-get? pending-txs txid) ERR_TX_NOT_FOUND))
+        (saved-contract (unwrap! (get contract pending) ERR_INVALID_TX_TYPE))
+        (recipient (get recipient pending))
+        (amount (get amount-or-id pending))
+        (opt-memo (get memo pending)))
+    (asserts! (is-signer tx-sender) ERR_PERMISSION_DENIED)
+    (asserts! (is-none (index-of? (get cosigners pending) tx-sender)) ERR_ALREADY_SIGNED)
+    (asserts! (is-eq (contract-of ft) saved-contract) ERR_CONTRACT_MISMATCH)
+    (var-set pending-txids (filter-uint txid (var-get pending-txids)))
+    (ok {
+      pending: none,
+      result: (some
+        (as-contract (contract-call? ft transfer
+          (get amount-or-id pending)
+          tx-sender
+          (get recipient pending)
+          (get memo pending)
+        )))
+    })
+  )
 )
 
 ;; Add an STX rule to the wallet
@@ -226,6 +336,27 @@ export const smartWalletContract = {
     (var-set next-rule-id (+ rule-id u1))
     (map-set rule-indices rule-id (len saved-rules))
     (map-set nft-rules (contract-of asset-contract) contract-rules)
+    (ok true)
+  )
+)
+
+;; Add an FT rule to the wallet
+(define-public (add-ft-rule (asset-contract <ft-trait>) (amount uint))
+  (let (
+      (rule-id (var-get next-rule-id))
+      (rule { id: rule-id, kind: FT_RULE, asset: (some (contract-of asset-contract)), amount-or-id: amount })
+      (saved-rules (var-get rules))
+      (opt-contract-rules (map-get? ft-rules (contract-of asset-contract)))
+      (contract-rules (match opt-contract-rules
+        existing-rules (unwrap! (as-max-len? (append existing-rules rule-id) u64) ERR_TOO_MANY_RULES)
+        (list rule-id)
+      ))
+    )
+    (asserts! (is-owner tx-sender) ERR_PERMISSION_DENIED)
+    (var-set rules (unwrap! (as-max-len? (append saved-rules rule) u64) ERR_TOO_MANY_RULES))
+    (var-set next-rule-id (+ rule-id u1))
+    (map-set rule-indices rule-id (len saved-rules))
+    (map-set ft-rules (contract-of asset-contract) contract-rules)
     (ok true)
   )
 )
@@ -282,6 +413,10 @@ export const smartWalletContract = {
   (merge {txid: txid} (unwrap-panic (map-get? pending-txs txid)))
 )
 
+(define-private (get-rule (id uint))
+  (unwrap-panic (element-at? (var-get rules) (unwrap-panic (map-get? rule-indices id))))
+)
+
 ;; Apply a rule to an STX transfer
 (define-private (apply-stx-rule
     (rule { id: uint, kind: uint, asset: (optional principal), amount-or-id: uint })
@@ -295,8 +430,42 @@ export const smartWalletContract = {
             (is-none (map-get? allow-list (get recipient state))))
         ))
       )
-    { amount: (get amount state), recipient: (get recipient state), requires-cosign: requires-cosign }
+    (merge state { requires-cosign: requires-cosign })
   )
 )
-  `,
+
+;; Apply a rule to an FT transfer
+(define-private (apply-ft-rule
+    (rule { id: uint, kind: uint, asset: (optional principal), amount-or-id: uint })
+    (state { asset-contract: principal, amount: uint, recipient: principal, requires-cosign: bool })
+  )
+  (let ((requires-cosign
+        (or
+          (and (is-eq (get kind rule) FT_RULE)
+            (>= (get amount state) (get amount-or-id rule)))
+          (and (is-eq (get kind rule) ALLOW_LIST_RULE)
+            (is-none (map-get? allow-list (get recipient state))))
+        ))
+      )
+    (merge state { requires-cosign: requires-cosign })
+  )
+)
+
+;; Apply a rule to an NFT transfer
+(define-private (apply-nft-rule
+    (rule { id: uint, kind: uint, asset: (optional principal), amount-or-id: uint })
+    (state { asset-contract: principal, id: uint, recipient: principal, requires-cosign: bool })
+  )
+  (let ((requires-cosign
+        (or
+          (and (is-eq (get kind rule) NFT_RULE)
+            (is-eq (get id state) (get amount-or-id rule)))
+          (and (is-eq (get kind rule) ALLOW_LIST_RULE)
+            (is-none (map-get? allow-list (get recipient state))))
+        ))
+      )
+    (merge state { requires-cosign: requires-cosign })
+  )
+)
+`,
 };

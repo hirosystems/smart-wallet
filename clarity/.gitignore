@@ -3,3 +3,4 @@
 **/settings/Testnet.toml
 .cache/**
 history.txt
+.debug_history
