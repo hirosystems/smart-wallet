@@ -31,6 +31,7 @@ import { useContext, useState } from 'react';
 import { Balances } from '~/lib/components/Balances';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { Rules } from '~/lib/components/Rules';
 import {
   API_URL,
   EXPLORER_URL,
@@ -155,6 +156,7 @@ function Send() {
         </VStack>
       ) : null}
       <Balances />
+      <Rules />
       <Box>
         <Text fontSize="xl" fontWeight="bold">
           Send STX, FT or NFT. For important transaction, your co-signer will be

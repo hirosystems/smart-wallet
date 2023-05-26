@@ -3,16 +3,14 @@ import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  FungibleConditionCode,
-  PostConditionMode,
   cvToHex,
-  cvToString,
+  FungibleConditionCode,
   hexToCV,
   makeContractSTXPostCondition,
+  PostConditionMode,
   uintCV,
 } from '@stacks/transactions';
-import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next/types';
 import { useContext } from 'react';
 
@@ -35,7 +33,6 @@ function Authenticate() {
   // get the params address
   const router = useRouter();
   const { currentAddress } = useContext(HiroWalletContext);
-
   const { doContractCall } = useConnect();
   // Get the query parameter from the URL
   const { ownerAddress, contractAddress, txid, id } = router.query;
