@@ -13,7 +13,7 @@ const Logo: FC<{ openBetaModal: () => void }> = ({ openBetaModal }) => (
     </NextLink>
     <Button variant="unstyled" display="flex" onClick={openBetaModal}>
       <Badge variant="outline" colorScheme="sky">
-        Beta
+        Hackathon
       </Badge>
     </Button>
   </Flex>
@@ -36,12 +36,6 @@ const NavBar: FC<{ height: any }> = ({ height }) => {
         }}
       />
       <UserMenu />
-      <BetaInfoModal
-        isOpen={isBetaInfoModalOpen}
-        onClose={() => {
-          setIsBetaInfoModalOpen(false);
-        }}
-      />
     </Flex>
   );
 };

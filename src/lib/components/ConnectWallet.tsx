@@ -31,7 +31,7 @@ const ConnectWallet = () => {
   if (mounted && userSession.isUserSignedIn()) {
     return (
       <div>
-        <Button className="Connect" onClick={disconnect}>
+        <Button className="Connect" onClick={disconnect} >
           Disconnect {userSession.loadUserData().profile.stxAddress.testnet}
         </Button>
       </div>
