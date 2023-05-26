@@ -101,6 +101,6 @@ const networkDevnet: NetworkConfiguration = {
 
 export function useCurrentNetwork(): NetworkConfiguration {
   //   return networkMainnet;
-  return networkTestnet;
-    // return networkDevnet; // TODO: don't hardcode network
+  // return networkTestnet;
+    return networkDevnet; // TODO: don't hardcode network
 }

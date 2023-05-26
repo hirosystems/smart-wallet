@@ -138,7 +138,7 @@ function createWallet() {
           />
         </Stack>
 
-        <Stack>
+        <Stack mt={8}>
           <Button type="submit">Submit</Button>
 
           <Tooltip
