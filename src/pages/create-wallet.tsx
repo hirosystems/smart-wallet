@@ -5,6 +5,7 @@ import {
   Input,
   Stack,
   Tooltip,
+  useToast,
 } from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
 import { AnchorMode } from '@stacks/transactions';
@@ -39,6 +40,8 @@ function createWallet() {
   const router = useRouter();
   const { doContractDeploy } = useConnect();
   const network = useCurrentNetwork();
+  const toast = useToast();
+
   const {
     handleSubmit,
     formState: { errors, isSubmitted },
@@ -48,6 +51,11 @@ function createWallet() {
     try {
       console.log(data);
       // await saveWalletOwnerMutation({ ...data, userAddress: testnetAddress });
+      toast({
+        title: "",
+        description: `User info saved successfully`,
+        status: "success",
+      });
     } catch (error) {
       console.error('Error during form submission: ', error);
     }
@@ -63,12 +71,27 @@ function createWallet() {
         onFinish: (data) => {
           const { txId } = data;
           openTxLink(txId, network.id);
+          toast({
+            title: "",
+            description: `Wallet deployed successfully`,
+            status: "success",
+          });
           router.push('/add-signer');
         },
         onCancel: () => {
+          toast({
+            title: "",
+            description: `Wallet deployment cancelled`,
+            status: "error",
+          });
           console.log('doSTXTransfer onCancel');
         },
         onError: (error) => {
+          toast({
+            title: "",
+            description: `Error deploying wallet`,
+            status: "error",
+          });
           console.log('doSTXTransfer onError', error);
         },
       });
