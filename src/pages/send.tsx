@@ -72,8 +72,8 @@ function Send() {
   );
   console.log('data signers', signers);
 
-  function sendSTX(amount, recipientAddress) {
-    console.log('sendSTX', amount, recipientAddress);
+  function sendSTX(amount) {
+    console.log('sendSTX', amount);
     doContractCall({
       network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
@@ -92,7 +92,7 @@ function Send() {
         fetch('/api/send-message', {
           method: 'POST',
           body: JSON.stringify({
-            stxAddress: recipientAddress,
+            stxAddress: SMART_WALLET_CONTRACT_ADDRESS,
             txId: data.txId,
           }),
         }).then((response) => response.json());
@@ -165,7 +165,7 @@ function Send() {
           onChange={(e) => setAmount(e.target.value)}
           value={amount}
         />
-        <Button m={2} onClick={() => sendSTX(amount, recipientAddress)}>
+        <Button m={2} onClick={() => sendSTX(amount)}>
           Send STX
         </Button>
       </Box>
