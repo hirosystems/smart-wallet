@@ -81,11 +81,12 @@ const Home = () => {
       const result = await getPendingTxs();
       if (!result) return;
       console.log('got result', result);
-      const formatted = result.result.list.map((item) => {
+      const formatted = result.list.map((item) => {
         const owner = cvToString(item.data.owner);
         const recipientAddress = cvToString(item.data.recipient)
         const txid = cvToString(item.data.txid)
-        return { owner, recipientAddress, txid }
+        const amount = cvToString(item.data['amount-or-id']);
+        return { owner, recipientAddress, txid, amount }
       });
       console.log('formatted', formatted);
       setPendingTxs(formatted);
@@ -121,6 +122,7 @@ const Home = () => {
               <Tr>
                 <Th>Txid</Th>
                 <Th>Recipient Address</Th>
+                <Th>Amount</Th>
               </Tr>
             </Thead>
               <Tbody>
@@ -129,6 +131,7 @@ const Home = () => {
                     return (<Tr key={item} >
                       <Td>{item['txid']}</Td>
                       <Td>{item['recipientAddress']}</Td>
+                      <Td>{item['amount']}</Td>
                     </Tr>)
                   })}
                 </>
