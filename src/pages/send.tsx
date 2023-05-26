@@ -104,6 +104,7 @@ function Send() {
           body: JSON.stringify({
             stxAddress: SMART_WALLET_CONTRACT_ADDRESS,
             txId: data.txId,
+            id: 0,
           }),
         }).then((response) => response.json());
 

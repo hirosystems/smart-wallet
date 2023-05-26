@@ -5,7 +5,7 @@ import { signers } from './store';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { stxAddress, txId } = JSON.parse(req.body);
+    const { stxAddress, txId, id } = JSON.parse(req.body);
     if (!stxAddress) {
       res
         .status(400)
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     console.log("send message to", email, phoneNumber, "with", stxAddress, "as setStxAddress")
 
     try {
-      const body = bodyNotifyToSign(stxAddress, txId);
+      const body = bodyNotifyToSign(stxAddress, txId, id);
       console.log('body message to send', body)
       const smsMessage = await sendSmsMessage(phoneNumber, body);
       const emailMessage = await sendEmailMessage(email, body);
