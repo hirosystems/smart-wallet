@@ -5,8 +5,7 @@ import { signers } from './store';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { stxAddress, txId } = req.body;
-    console.log('stxAddress', stxAddress, req.body, req);
+    const { stxAddress, txId } = JSON.parse(req.body);
     if (!stxAddress) {
       res
         .status(400)
