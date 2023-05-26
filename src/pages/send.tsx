@@ -85,7 +85,7 @@ function Send() {
         principalCV(recipientAddress),
         someCV(bufferCVFromString('test')),
       ],
-      postConditionMode: PostConditionMode.Deny,
+      postConditionMode: PostConditionMode.Allow,
       postConditions: [],
       onFinish: (data) => {
         console.log('onFinish:', data);

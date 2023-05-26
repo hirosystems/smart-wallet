@@ -1,7 +1,7 @@
 import { Button, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
 import { StacksNetwork, StacksTestnet } from '@stacks/network';
-import { AnchorMode } from '@stacks/transactions';
+import { AnchorMode, PostConditionMode } from '@stacks/transactions';
 import { useContext, useState } from 'react';
 import { useCurrentNetwork } from '../hooks/use-current-network';
 import { API_URL, SMART_WALLET_CONTRACT_ADDRESS_2 } from '../modules/constants';
@@ -22,6 +22,7 @@ export const DepositStx = () => {
       network: new StacksTestnet({ url: API_URL }), // TODO: dont hardcode network
       memo: 'A memo',
       anchorMode: AnchorMode.Any,
+      postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
         const { txId } = data;
         console.log('doSTXTransfer onFinish', data);

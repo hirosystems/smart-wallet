@@ -41,7 +41,7 @@ function Authenticate () {
       contractName: SMART_WALLET_CONTRACT_NAME,
       functionName: 'cosign-tx',
       functionArgs: [uintCV(txId)],
-      postConditionMode: PostConditionMode.Deny,
+      postConditionMode: PostConditionMode.Allow,
       postConditions: [],
       onFinish: (data) => {
         console.log('onFinish:', data);
