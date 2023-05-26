@@ -1,6 +1,6 @@
 import { Box, Stack } from '@chakra-ui/react';
 import { useContext } from 'react';
-import { useSmartWallet } from '../hooks/use-smart-wallet';
+import { useHardcodedSmartWallet } from '../hooks/use-smart-wallet';
 
 import { useStxAssetBalance } from '../hooks/use-stx-balance';
 import { SMART_WALLET_CONTRACT_ADDRESS_2 } from '../modules/constants';
@@ -16,7 +16,7 @@ export const Balances = () => {
     hasSmartWallet,
     isLoading: isSmartWalletLoading,
     error,
-  } = useSmartWallet();
+  } = useHardcodedSmartWallet();
   if (!currentAddress) return null;
   const { stxAssetBalance: hiroWalletStxAssetBalance } =
     useStxAssetBalance(currentAddress);

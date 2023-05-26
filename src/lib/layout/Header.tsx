@@ -2,11 +2,21 @@ import { Box, Flex } from '@chakra-ui/react';
 
 import ConnectWallet from '../components/ConnectWallet';
 
-import ThemeToggle from './ThemeToggle';
-
 const Header = () => {
   return (
-    <Flex as="header" width="full" align="center">
+    <Flex
+      as="nav"
+      width="full"
+      align="center"
+      style={{
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        padding: '1em',
+        background: '#333',
+        color: 'white',
+      }}
+    >
       <Box marginLeft="auto">
         <ConnectWallet />
       </Box>

@@ -1,35 +1,44 @@
 import type { AddressTransactionsListResponse } from '@stacks/blockchain-api-client';
+import { useQuery } from '@tanstack/react-query';
 import { useContext } from 'react';
 import HiroWalletContext from '../components/HiroWalletContext';
 import { SMART_WALLET_CONTRACT_NAME } from '../utils/smart-wallet-utils';
+import { useStacksClientUnanchored } from './use-stx-balance';
 
 export const useSmartWallet = () => {
-  // const testnetAddress = 'ST1QA3YTTDH9QFNFPMKFYVHW17M5ZYKSB6NMPFSSJ';
-    const { testnetAddress } = useContext(HiroWalletContext);
-  //   const stacksClient = useStacksClientUnanchored();
+  // const briceTestnetAddress = 'ST1QA3YTTDH9QFNFPMKFYVHW17M5ZYKSB6NMPFSSJ';
+  const { currentAddress } = useContext(HiroWalletContext);
+  const stacksClient = useStacksClientUnanchored();
 
-  //   const { data, isLoading, error } = useQuery(
-  //     ['get-address-transactions', testnetAddress],
-  //     async () => {
-  //       console.log({ stacksClient });
-  //       const transactions =
-  //         await stacksClient.accountsApi.getAccountTransactions({
-  //           principal: testnetAddress || '',
-  //         });
-  //       console.log({ transactions });
-  //       return checkTransactionsForSmartWalletDeploy(transactions);
-  //     },
-  //     { enabled: !!testnetAddress }
-  //   );
+  const { data, isLoading, error } = useQuery(
+    ['get-address-transactions', currentAddress],
+    async () => {
+      console.log({ stacksClient });
+      const transactions =
+        await stacksClient.accountsApi.getAccountTransactions({
+          principal: currentAddress || '',
+        });
+      console.log({ transactions });
+      return checkTransactionsForSmartWalletDeploy(transactions);
+    },
+    { enabled: !!currentAddress }
+  );
 
-  //   if (!testnetAddress) {
-  //     console.error('No testnet address found');
-  //     return { hasSmartWallet: false, isLoading: false, error: null };
-  //   }
+  if (!currentAddress) {
+    console.error('No testnet address found');
+    return { hasSmartWallet: false, isLoading: false, error: null };
+  }
 
-  const smartWalletAddress = `${testnetAddress}.${SMART_WALLET_CONTRACT_NAME}`;
+  const smartWalletAddress = `${currentAddress}.${SMART_WALLET_CONTRACT_NAME}`;
 
-  //   return { hasSmartWallet: data, smartWalletAddress, isLoading, error };
+  return { hasSmartWallet: data, smartWalletAddress, isLoading, error };
+};
+
+export const useHardcodedSmartWallet = () => {
+  // const briceTestnetAddress = 'ST1QA3YTTDH9QFNFPMKFYVHW17M5ZYKSB6NMPFSSJ';
+  const { currentAddress } = useContext(HiroWalletContext);
+  const smartWalletAddress = `${currentAddress}.${SMART_WALLET_CONTRACT_NAME}`;
+
   return {
     hasSmartWallet: true,
     smartWalletAddress,

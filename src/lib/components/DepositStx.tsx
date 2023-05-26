@@ -10,19 +10,16 @@ import HiroWalletContext from './HiroWalletContext';
 
 export const DepositStx = () => {
   const network = useCurrentNetwork();
-  const { testnetAddress, devnetAddress, mainnetAddress } =
-    useContext(HiroWalletContext);
-  //   console.log('DepositStxButton', {amount, testnetAddress, network: network.id, devnetAddress, mainnetAddress})
-
   const [inputAmount, setInputAmount] = useState('');
   const { doSTXTransfer } = useConnect();
+  // const { testnetAddress, devnetAddress, mainnetAddress } =
+  //   useContext(HiroWalletContext);
 
-  // TODO: get network being used
   const onClickHandler = async () => {
     doSTXTransfer({
       amount: (parseInt(inputAmount) * 1000000).toString(),
       recipient: SMART_WALLET_CONTRACT_ADDRESS_2,
-      network: new StacksTestnet({ url: API_URL }), //network.id,
+      network: new StacksTestnet({ url: API_URL }), // TODO: dont hardcode network
       memo: 'A memo',
       anchorMode: AnchorMode.Any,
       onFinish: (data) => {
@@ -38,26 +35,6 @@ export const DepositStx = () => {
         console.log('doSTXTransfer onError', error);
       },
     });
-    // const txOptions = {
-    //   recipient: SMART_WALLET_CONTRACT_ADDRESS_2,
-    //   amount: parseInt(inputAmount) * 1000000, //BigInt(amount) * 1000000n,
-    //   publicKey: devnetAddress || '',
-    //   network: network.id, // for mainnet, use 'mainnet' // TODO: stackjs isnt supporting devnet
-    //   //   memo: 'test stx transfer (deposit)',
-    //   //   nonce: 0n, // set a nonce manually if you don't want builder to fetch from a Stacks node
-    //   fee: 200, // 200n // set a tx fee if you don't want the builder to estimate
-    //   anchorMode: AnchorMode.Any,
-    // };
-
-    // const transaction = await makeUnsignedSTXTokenTransfer(txOptions);
-
-    // // to see the raw serialized tx
-    // // const serializedTx = transaction.serialize(); // Uint8Array
-    // // const serializedTxHex = bytesToHex(serializedTx); // hex string
-
-    // // broadcasting transaction to the specified network
-    // const broadcastResponse = await broadcastTransaction(transaction);
-    // const txId = broadcastResponse.txid;
   };
 
   return (

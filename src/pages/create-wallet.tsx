@@ -1,17 +1,21 @@
-import { Box, Button, FormLabel, Input, Tooltip } from '@chakra-ui/react';
-import { StacksTestnet } from '@stacks/network';
 import {
-  AnchorMode,
-  broadcastTransaction,
-  makeContractDeploy,
-} from '@stacks/transactions';
+  Box,
+  Button,
+  FormLabel,
+  Input,
+  Stack,
+  Tooltip,
+} from '@chakra-ui/react';
+import { useConnect } from '@stacks/connect-react';
+import { AnchorMode } from '@stacks/transactions';
 import { useRouter } from 'next/router';
 import { useCallback, useContext } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { smartWalletContract } from '~/lib/contracts/wallet-contract';
-import { API_URL, EXPLORER_URL } from '~/lib/modules/constants';
-import { SMART_WALLET_CONTRACT_NAME } from '~/lib/utils/smart-wallet-utils';
+import { useCurrentNetwork } from '~/lib/hooks/use-current-network';
+import { DEVNET, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { openTxLink } from '~/lib/utils/transactions-utils';
 
 function fetchSigners(userAddress) {
   return async () => {
@@ -30,74 +34,53 @@ async function saveWalletOwnerMutation(formData) {
   return response.json();
 }
 
-async function deployWallet(address: string) {
-  // for mainnet, use `StacksMainnet()`
-<<<<<<< HEAD
-  const network = new StacksTestnet();
-=======
-  const network = new StacksTestnet({ url: API_URL });
-  const { testnetAddress, mainnetAddress } = useContext(HiroWalletContext);
->>>>>>> main
-
-  if (!address) {
-    throw new Error('No testnet address found');
-  }
-
-  const txOptions = {
-    contractName: SMART_WALLET_CONTRACT_NAME,
-    codeBody: smartWalletContract.source,
-    senderKey: address, // TODO: hardcoded for now
-    network,
-    anchorMode: AnchorMode.Any,
-  };
-
-  const transaction = await makeContractDeploy(txOptions);
-  const broadcastResponse = await broadcastTransaction(transaction, network);
-  return broadcastResponse.txid;
-  // TODO: save txId to DB?
-}
-
 function createWallet() {
-  const { testnetAddress } = useContext(HiroWalletContext);
+  const { currentAddress } = useContext(HiroWalletContext);
+  const router = useRouter();
+  const { doContractDeploy } = useConnect();
+  const network = useCurrentNetwork();
   const {
-    register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitted },
     control,
   } = useForm();
   const onSubmit = async (data) => {
     try {
       console.log(data);
-      await saveWalletOwnerMutation({ ...data, userAddress: testnetAddress });
+      // await saveWalletOwnerMutation({ ...data, userAddress: testnetAddress });
     } catch (error) {
       console.error('Error during form submission: ', error);
     }
   };
-  const router = useRouter();
 
-  console.log({ errors, isSubmitted });
-
-  const deployWalletOnClickHandler = useCallback((testnetAddress: string) => {
+  const deployWalletOnClickHandler = useCallback(() => {
     const deployWalletAsync = async () => {
-      // for mainnet, use `StacksMainnet()`
-      const txId = await deployWallet(testnetAddress);
-      window.open(
-        `https://explorer.hiro.so/txid/${txId}?chain=testnet`,
-        '_blank'
-      );
-
-      router.push('/add-signer');
+      doContractDeploy({
+        contractName: smartWalletContract.name,
+        codeBody: smartWalletContract.source,
+        network: DEVNET,
+        anchorMode: AnchorMode.Any,
+        onFinish: (data) => {
+          const { txId } = data;
+          openTxLink(txId, network.id);
+          router.push('/add-signer');
+        },
+        onCancel: () => {
+          console.log('doSTXTransfer onCancel');
+        },
+        onError: (error) => {
+          console.log('doSTXTransfer onError', error);
+        },
+      });
     };
     deployWalletAsync();
   }, [router]);
 
   return (
-    /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <Box>
       <Box> This info will be used to notify about your wallet activity </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Box>
+        <Stack>
           <Controller
             name="email"
             control={control}
@@ -134,27 +117,27 @@ function createWallet() {
               </>
             )}
           />
-        </Box>
-        <Button type="submit">Submit</Button>
+        </Stack>
 
-        {/* Button that can only be clicked after the form has been submitted */}
-        <Box>
-          <Tooltip
-            label={
-              !isSubmitted
-                ? 'User details are required before deploying your smart wallet'
-                : ''
-            }
-            hasArrow
-          >
-            <Button
-              isDisabled={!isSubmitted}
-              onClick={() => deployWalletOnClickHandler(testnetAddress)}
+        <Stack>
+          <Button type="submit">Submit</Button>
+
+            <Tooltip
+              label={
+                !isSubmitted
+                  ? 'User details are required before deploying your smart wallet'
+                  : ''
+              }
+              hasArrow
             >
-              Deploy Smart Wallet
-            </Button>
-          </Tooltip>
-        </Box>
+              <Button
+                isDisabled={!isSubmitted}
+                onClick={deployWalletOnClickHandler}
+              >
+                Deploy Smart Wallet
+              </Button>
+            </Tooltip>
+        </Stack>
       </form>
     </Box>
   );

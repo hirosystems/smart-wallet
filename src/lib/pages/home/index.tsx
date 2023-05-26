@@ -15,7 +15,7 @@ import { useCallback, useContext } from 'react';
 import { Balances } from '~/lib/components/Balances';
 import { DepositStx } from '~/lib/components/DepositStx';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
-import { useSmartWallet } from '~/lib/hooks/use-smart-wallet';
+import { useHardcodedSmartWallet, useSmartWallet } from '~/lib/hooks/use-smart-wallet';
 
 const Home = () => {
   const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
@@ -26,16 +26,24 @@ const Home = () => {
     router.push('/create-wallet');
   }, [router]);
 
+  // const {
+  //   hasSmartWallet,
+  //   isLoading: isSmartWalletLoading,
+  //   error,
+  // } = useHardcodedSmartWallet();
+
   const {
     hasSmartWallet,
     isLoading: isSmartWalletLoading,
     error,
   } = useSmartWallet();
-  console.log('useSmartWallet', {
-    hasSmartWallet,
-    isSmartWalletLoading,
-    error,
-  });
+
+  // console.log('useSmartWallet', {
+  //   hasSmartWallet,
+  //   isSmartWalletLoading,
+  //   error,
+  // });
+  
   return (
     <Flex
       direction="column"

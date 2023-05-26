@@ -76,7 +76,7 @@ export const HiroWalletProvider: FC<ProviderProps> = ({ children }) => {
   // TODO: stacksjs needs to add support for devnet addresses
   const devnetAddress = isWalletConnected
     ? userSession.loadUserData().profile.stxAddress.devnet ||
-      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'
+      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM' // Hard coded devnet deployer address
     : null;
 
   const currentAddress = network.id === 'testnet' ? testnetAddress : network.id === 'mainnet' ? mainnetAddress : devnetAddress;
