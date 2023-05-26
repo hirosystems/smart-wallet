@@ -92,6 +92,16 @@ const Home = () => {
               </Link>
             ) : null}
             {hasSmartWallet ? <DepositStx /> : null}
+            <Link href="/send">
+              <Button mt={8} colorScheme="teal" type="submit" variant="primary">
+               Send a transaction
+              </Button>
+            </Link>
+            <Link href="/rules">
+              <Button mt={8} colorScheme="teal" type="submit">
+               Set Rules 
+              </Button>
+            </Link>
           </HStack>
         </Flex>
       </Box>

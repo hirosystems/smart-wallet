@@ -187,7 +187,7 @@ function AddSigner(props) {
               />
             </FormControl>
             <Link href="/">
-              <Button mt={8} colorScheme="teal" type="submit">
+              <Button mt={8} colorScheme="teal" type="submit" variant="primary">
                 Back
               </Button>
             </Link>

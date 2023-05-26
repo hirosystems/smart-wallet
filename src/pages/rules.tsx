@@ -164,7 +164,7 @@ function Rules() {
           onChange={(e) => setAmount(e.target.value)}
           value={amount}
         />
-        <Button m={2} onClick={() => addSTXRule(amount)}>
+        <Button m={2} onClick={() => addSTXRule(amount)} variant="primary">
           Add rule
         </Button>
       </Box>
