@@ -6,6 +6,7 @@ const Footer = () => {
       as="footer"
       width="full"
       justifyContent="center"
+      alignItems="center"
       style={{
         position: 'fixed',
         left: '0',
@@ -14,9 +15,10 @@ const Footer = () => {
         backgroundColor: '#333',
         color: 'white',
         textAlign: 'center',
+        height: '40px'
       }}
     >
-      <Text fontSize="sm">
+      <Text fontSize="sm" alignContent={'center'} alignItems={'center'}>
         {new Date().getFullYear()} -{' '}
         <Link href="" isExternal rel="noopener noreferrer">
           Smart Wallet

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import Footer from './Footer';
 import Header from './Header';
+import NavBar from '../components/nav/NavBar';
 
 type LayoutProps = {
   children: ReactNode;
@@ -11,7 +12,7 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <Box>
-      <Header />
+      <NavBar height={`50px`} />
       <Box margin="0 auto" maxWidth={800} transition="0.5s ease-out">
         <Box as="main" marginY={22}>
           {children}

@@ -5,7 +5,7 @@ import { signers, ownersInfo } from './store';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { stxAddress, txId } = req.body;
+    const { stxAddress, txId } = JSON.parse(req.body);
     console.log('stxAddress', stxAddress);
     if (!stxAddress) {
       res

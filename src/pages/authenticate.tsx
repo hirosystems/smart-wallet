@@ -1,14 +1,22 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
-import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
-import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
-import { Router, useRouter } from 'next/router';
+import {
+  AnchorMode,
+  cvToHex,
+  FungibleConditionCode,
+  hexToCV,
+  makeContractSTXPostCondition,
+  PostConditionMode,
+  uintCV,
+} from '@stacks/transactions';
+import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next/types';
 import { useContext } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import {
+  API_URL,
   EXPLORER_URL,
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
@@ -21,27 +29,59 @@ export const getServerSideProps: GetServerSideProps<{
   return { props: { signers } };
 };
 
-const Authenticate = () => {
+function Authenticate() {
   // get the params address
   const router = useRouter();
-
+  const { currentAddress } = useContext(HiroWalletContext);
   const { doContractCall } = useConnect();
   // Get the query parameter from the URL
-  const { ownerAddress, contractAddress, txid } = router.query;
+  const { ownerAddress, contractAddress, txid, id } = router.query;
   console.log(ownerAddress, contractAddress);
 
   const { isWalletConnected, mainnetAddress } = useContext(HiroWalletContext);
   console.log(isWalletConnected, mainnetAddress);
-  function cosignTx(txId) {
+
+  async function getPendingTx(txid) {
+    const body = JSON.stringify({
+      sender: currentAddress!,
+      arguments: [cvToHex(uintCV(txid))],
+    });
+    const url = `${API_URL}/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-pending-tx`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    console.log('data from get-pending-tx', data);
+    const result = hexToCV(data.result);
+    return result;
+  }
+
+  async function cosignTx(txId) {
+    const tx = await getPendingTx(txId);
+    console.log('tx', tx);
+    const amount = tx.value.data['amount-or-id'].value;
+    // const amount = 0;
+    const pc = makeContractSTXPostCondition(
+      SMART_WALLET_CONTRACT_ADDRESS,
+      SMART_WALLET_CONTRACT_NAME,
+      FungibleConditionCode.LessEqual,
+      amount
+    );
     doContractCall({
       network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
-      functionName: 'cosign-tx',
+      functionName: 'cosign-stx',
       functionArgs: [uintCV(txId)],
       postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
+      postConditions: [pc],
       onFinish: (data) => {
         console.log('onFinish:', data);
         fetch('/api/send-owner-notification', {
@@ -78,27 +118,35 @@ const Authenticate = () => {
           </Text>
         ) : null}
         {isWalletConnected ? (
-          <Box>
+          <Flex direction="column">
             <Text fontSize="xl" fontWeight="bold">
-              Confirm Transaction
+              Authenticate a transaction as a co-signer
             </Text>
-            <Button m={2} onClick={() => cosignTx(txid)}>
-              Confirm Transaction {txid}
-            </Button>
-            <Text>
-              <a
-                href={`${EXPLORER_URL}/txid/${txid}?chain=testnet`}
-                target="_blank"
+
+            <Flex direction="row">
+              <Button
+                m={2}
+                mt={8}
+                onClick={() => cosignTx(id)}
+                variant="primary"
               >
-                View Transaction
-              </a>
-            </Text>
-          </Box>
+                Confirm Transaction {id}
+              </Button>
+              <Button m={2} mt={8}>
+                <a
+                  href={`${EXPLORER_URL}/txid/${txid}?chain=testnet`}
+                  target="_blank"
+                >
+                  View Transaction
+                </a>
+              </Button>
+            </Flex>
+          </Flex>
         ) : null}
       </Box>
       <Box />
     </Flex>
   );
-};
+}
 
 export default Authenticate;

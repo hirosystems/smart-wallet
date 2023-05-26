@@ -13,34 +13,28 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
-import { test } from '@playwright/test';
 import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  OptionalCV,
+  cvToString,
+  hexToCV,
   PostConditionMode,
-  bufferCVFromString,
-  serializeCV,
-  someCV,
-  stringUtf8CV,
   uintCV,
 } from '@stacks/transactions';
-import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
-import { getRecipientAddress } from '@stacks/ui-utils';
 import { useQuery } from '@tanstack/react-query';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import {
+  API_URL,
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
-  API_URL,
 } from '~/lib/modules/constants';
-import { cvToHex } from '~/lib/utils/smart-wallet-utils';
+import {Rules as RulesComponent} from '~/lib/components/Rules';
 
-function fetchSigners(userAddress) {
+function fetchSigners(userAddress: string) {
   return async () => {
     if (!userAddress) return;
     const response = await fetch(`/api/get-signers?userAddress=${userAddress}`);
@@ -56,7 +50,9 @@ function Rules() {
   const { doContractCall } = useConnect();
 
   const [amount, setAmount] = useState('1');
-  const [recipientAddress, setRecipientAddress] = useState('ST2CEP848SACBBX7KHVC4TBZXBV0JH6SC0WF439NF');
+  const [recipientAddress, setRecipientAddress] = useState(
+    'ST2CEP848SACBBX7KHVC4TBZXBV0JH6SC0WF439NF'
+  );
   const { testnetAddress } = useContext(HiroWalletContext);
 
   // get the co-signer data
@@ -69,8 +65,7 @@ function Rules() {
   );
   console.log('data signers', signers);
 
-  async function getSTXRule() {
-    // const args = functionArgs.map(arg => cvToHex(arg));
+  async function getSTXRules() {
     const body = JSON.stringify({
       sender: testnetAddress,
       arguments: [],
@@ -84,15 +79,32 @@ function Rules() {
         'Content-Type': 'application/json',
       },
     });
-  
-    return response.json();
+
+    const data = await response.json();
+    console.log('data from getSTXRule', data);
+    const result = hexToCV(data.result);
+    return result;
   }
 
+  const [stxRules, setStxRules] = useState();
+  // const rules = {"okay": true, "result": "0x0b000000010c000000040c616d6f756e742d6f722d69640100000000000000000000000005f5e100056173736574090269640100000000000000000000000000000000046b696e640100000000000000000000000000000000"}
   useEffect(() => {
     if (!testnetAddress) return;
-    getSTXRule()
+    async function getRules() {
+      const result = await getSTXRules();
+      console.log('got result', result);
+      const formatted = result.list.map((item) => {
+        const amountOrId = cvToString(item.data['amount-or-id']);
+        const asset = cvToString(item.data.asset);
+        const id = cvToString(item.data.id);
+        const kind = cvToString(item.data.kind);
+        return { amountOrId, asset, id, kind };
+      });
+      console.log('formatted', formatted);
+      setStxRules(formatted);
+    }
+    getRules();
   }, [testnetAddress]);
-
 
   function addSTXRule(amount) {
     doContractCall({
@@ -106,7 +118,7 @@ function Rules() {
       postConditions: [],
       onFinish: (data) => {
         console.log('onFinish:', data);
-       window.location.reload(); 
+        window.location.reload();
       },
       onCancel: () => {
         console.log('onCancel:', 'Transaction was canceled');
@@ -124,6 +136,15 @@ function Rules() {
       mb={8}
       w="full"
     >
+      <Box mt={8}>
+        <Text fontSize="xl" fontWeight="bold">
+          Add rules to secure your smart wallet for any STX, FT and NFT
+          transfer. If a transaction satisfies any of these rules, a
+          notification will be sent to your co-signer for approval.
+        </Text>
+      </Box>
+      <RulesComponent />
+
       {signers && signers.length > 0 ? (
         <VStack spacing={4} align="stretch">
           <Table variant="simple">
@@ -149,22 +170,19 @@ function Rules() {
           </Table>
         </VStack>
       ) : null}
-      <Box mt={8}>
-        <Text fontSize="xl" fontWeight="bold">
-          Add rules to secure your smart wallet for any STX, FT and NFT transfer. If a transaction satisfies any of
-          these rules, a notification will be sent to your co-signer for approval.
-        </Text>
-      </Box>
-      <br/>
-      <hr/>
+      <br />
+      <hr />
       <Box width={'100%'}>
-        <FormLabel>Minimum STX threshold that necessitates a co-signer for executing any transfer</FormLabel>
+        <FormLabel>
+          Minimum STX threshold that necessitates a co-signer for executing any
+          transfer
+        </FormLabel>
         <Input
           placeholder="10"
           onChange={(e) => setAmount(e.target.value)}
           value={amount}
         />
-        <Button m={2} onClick={() => addSTXRule(amount)}>
+        <Button m={2} onClick={() => addSTXRule(amount)} variant="primary">
           Add rule
         </Button>
       </Box>

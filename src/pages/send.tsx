@@ -17,20 +17,21 @@ import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  OptionalCV,
-  PostConditionMode,
   bufferCVFromString,
+  FungibleConditionCode,
+  makeContractSTXPostCondition,
+  PostConditionMode,
   someCV,
-  stringUtf8CV,
   uintCV,
 } from '@stacks/transactions';
 import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
-import { getRecipientAddress } from '@stacks/ui-utils';
 import { useQuery } from '@tanstack/react-query';
 import Router, { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
+import { Balances } from '~/lib/components/Balances';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
+import { Rules } from '~/lib/components/Rules';
 import {
   API_URL,
   EXPLORER_URL,
@@ -72,8 +73,15 @@ function Send() {
   );
   console.log('data signers', signers);
 
-  function sendSTX(amount, recipientAddress) {
-    console.log('sendSTX', amount, recipientAddress);
+  function sendSTX(amount) {
+    console.log('sendSTX', amount);
+    amount *= 1_000_000;
+    const pc = makeContractSTXPostCondition(
+      SMART_WALLET_CONTRACT_ADDRESS,
+      SMART_WALLET_CONTRACT_NAME,
+      FungibleConditionCode.LessEqual,
+      amount
+    );
     doContractCall({
       network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
@@ -86,14 +94,15 @@ function Send() {
         someCV(bufferCVFromString('test')),
       ],
       postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
+      postConditions: [pc],
       onFinish: (data) => {
         console.log('onFinish:', data);
         fetch('/api/send-message', {
           method: 'POST',
           body: JSON.stringify({
-            stxAddress: testnetAddress,
+            stxAddress: SMART_WALLET_CONTRACT_ADDRESS,
             txId: data.txId,
+            id: 0,
           }),
         }).then((response) => response.json());
 
@@ -146,6 +155,8 @@ function Send() {
           </Table>
         </VStack>
       ) : null}
+      <Balances />
+      <Rules />
       <Box>
         <Text fontSize="xl" fontWeight="bold">
           Send STX, FT or NFT. For important transaction, your co-signer will be
@@ -165,7 +176,7 @@ function Send() {
           onChange={(e) => setAmount(e.target.value)}
           value={amount}
         />
-        <Button m={2} onClick={() => sendSTX(amount, recipientAddress)}>
+        <Button m={2} onClick={() => sendSTX(amount)}>
           Send STX
         </Button>
       </Box>
