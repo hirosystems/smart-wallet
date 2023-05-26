@@ -92,7 +92,8 @@ function Rules() {
     return result
   }
 
-  const [stxRules, setStxRules] = useState('')
+  const [stxRules, setStxRules] = useState([])
+    const rules = {"okay": true, "result": "0x0b000000010c000000040c616d6f756e742d6f722d69640100000000000000000000000005f5e100056173736574090269640100000000000000000000000000000000046b696e640100000000000000000000000000000000"}
   useEffect(() => {
     if (!testnetAddress) return;
     async function getRules() {

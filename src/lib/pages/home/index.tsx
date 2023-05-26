@@ -81,10 +81,10 @@ const Home = () => {
       const result = await getPendingTxs();
       if (!result) return;
       console.log('got result', result);
-      const formatted = hexToCV(result.result).list.map((item) => {
+      const formatted = result.result.list.map((item) => {
         const owner = cvToString(item.data.owner);
         const recipientAddress = cvToString(item.data.recipient)
-        const txid = cvToString(item.data.txid).replace('u', '')
+        const txid = cvToString(item.data.txid)
         return { owner, recipientAddress, txid }
       });
       console.log('formatted', formatted);
@@ -94,6 +94,7 @@ const Home = () => {
   }, [testnetAddress]);
 
   // const obj = {"okay":true,"result":"0x0b000000010c000000070c616d6f756e742d6f722d6964010000000000000000000000000605234008636f6e74726163740909636f7369676e6572730b00000000046d656d6f0a020000000474657374056f776e6572051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce09726563697069656e74051a98eb2088ca98b5f4f38ed84d2ffd5ec1289b2c0704747869640100000000000000000000000000000000"}
+  // const objc = {}
   // const rules = {"okay": true, "result": "0x0b000000010c000000040c616d6f756e742d6f722d69640100000000000000000000000005f5e100056173736574090269640100000000000000000000000000000000046b696e640100000000000000000000000000000000"}
   // console.log('pendingTxs', hexToCV(obj.result))
   // console.log('rules', hexToCV(rules.result))
@@ -125,10 +126,10 @@ const Home = () => {
               <Tbody>
                 <>
                   {pendingTxs && pendingTxs.length > 0 && pendingTxs.map((item) => {
-                    <Tr key={item} >
-                      <Td>Foo {item['txd']}</Td>
-                      <Td>BAR {item['recipientAddress']}</Td>
-                    </Tr>
+                    return (<Tr key={item} >
+                      <Td>{item['txid']}</Td>
+                      <Td>{item['recipientAddress']}</Td>
+                    </Tr>)
                   })}
                 </>
               </Tbody>
