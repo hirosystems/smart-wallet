@@ -17,21 +17,18 @@ import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  FungibleConditionCode,
-  OptionalCV,
-  PostConditionMode,
   bufferCVFromString,
+  FungibleConditionCode,
   makeContractSTXPostCondition,
-  makeStandardSTXPostCondition,
+  PostConditionMode,
   someCV,
-  stringUtf8CV,
   uintCV,
 } from '@stacks/transactions';
 import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
-import { getRecipientAddress } from '@stacks/ui-utils';
 import { useQuery } from '@tanstack/react-query';
 import Router, { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
+import { Balances } from '~/lib/components/Balances';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import {
@@ -157,6 +154,7 @@ function Send() {
           </Table>
         </VStack>
       ) : null}
+      <Balances />
       <Box>
         <Text fontSize="xl" fontWeight="bold">
           Send STX, FT or NFT. For important transaction, your co-signer will be
