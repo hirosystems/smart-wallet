@@ -1,7 +1,14 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
-import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
+import {
+  AnchorMode,
+  FungibleConditionCode,
+  PostConditionMode,
+  hexToCV,
+  makeContractSTXPostCondition,
+  uintCV,
+} from '@stacks/transactions';
 import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
 import { Router, useRouter } from 'next/router';
 import { GetServerSideProps } from 'next/types';
@@ -22,7 +29,7 @@ export const getServerSideProps: GetServerSideProps<{
   return { props: { signers } };
 };
 
-function Authenticate () {
+function Authenticate() {
   // get the params address
   const router = useRouter();
 
@@ -33,7 +40,38 @@ function Authenticate () {
 
   const { isWalletConnected, mainnetAddress } = useContext(HiroWalletContext);
   console.log(isWalletConnected, mainnetAddress);
-  function cosignTx(txId) {
+
+  async function getPendingTx(txid) {
+    const body = JSON.stringify({
+      sender: ownerAddress,
+      arguments: [uintCV(txid)],
+    });
+    const url = `${API_URL}/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-pending-tx`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    console.log('data from get-pending-tx', data);
+    const result = hexToCV(data.result);
+    return result;
+  }
+
+  async function cosignTx(txId) {
+    const tx = await getPendingTx(txId);
+    console.log('tx', tx);
+    const amount = 0;
+    // const pc = makeContractSTXPostCondition(
+    //   SMART_WALLET_CONTRACT_ADDRESS,
+    //   SMART_WALLET_CONTRACT_NAME,
+    //   FungibleConditionCode.LessEqual,
+    //   amount
+    // );
     doContractCall({
       network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
@@ -42,7 +80,7 @@ function Authenticate () {
       functionName: 'cosign-tx',
       functionArgs: [uintCV(txId)],
       postConditionMode: PostConditionMode.Allow,
-      postConditions: [],
+      // postConditions: [pc],
       onFinish: (data) => {
         console.log('onFinish:', data);
         fetch('/api/send-owner-notification', {
@@ -79,13 +117,18 @@ function Authenticate () {
           </Text>
         ) : null}
         {isWalletConnected ? (
-          <Flex direction="column" >
+          <Flex direction="column">
             <Text fontSize="xl" fontWeight="bold">
               Authenticate a transaction as a co-signer
             </Text>
 
-            <Flex direction="row" >
-              <Button m={2} mt={8} onClick={() => cosignTx(txid)} variant="primary">
+            <Flex direction="row">
+              <Button
+                m={2}
+                mt={8}
+                onClick={() => cosignTx(txid)}
+                variant="primary"
+              >
                 Confirm Transaction {txid}
               </Button>
               <Button m={2} mt={8}>
@@ -96,7 +139,6 @@ function Authenticate () {
                   View Transaction
                 </a>
               </Button>
-
             </Flex>
           </Flex>
         ) : null}
@@ -104,6 +146,6 @@ function Authenticate () {
       <Box />
     </Flex>
   );
-};
+}
 
 export default Authenticate;

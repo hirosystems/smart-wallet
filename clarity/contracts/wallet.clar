@@ -368,7 +368,11 @@
 (define-read-only (get-pending-txids) (var-get pending-txids))
 
 (define-read-only (get-pending-txs)
-  (map get-pending-tx (var-get pending-txids))
+  (map get-pending-tx-unsafe (var-get pending-txids))
+)
+
+(define-read-only (get-pending-tx (txid uint))
+  (map-get? pending-txs txid)
 )
 
 ;; private functions
@@ -404,7 +408,7 @@
 )
 
 ;; Retrieve a pending transaction by its txid
-(define-private (get-pending-tx (txid uint))
+(define-private (get-pending-tx-unsafe (txid uint))
   (merge {txid: txid} (unwrap-panic (map-get? pending-txs txid)))
 )
 

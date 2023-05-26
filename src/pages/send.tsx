@@ -17,9 +17,12 @@ import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
+  FungibleConditionCode,
   OptionalCV,
   PostConditionMode,
   bufferCVFromString,
+  makeContractSTXPostCondition,
+  makeStandardSTXPostCondition,
   someCV,
   stringUtf8CV,
   uintCV,
@@ -74,6 +77,13 @@ function Send() {
 
   function sendSTX(amount) {
     console.log('sendSTX', amount);
+    amount *= 1_000_000;
+    const pc = makeContractSTXPostCondition(
+      SMART_WALLET_CONTRACT_ADDRESS,
+      SMART_WALLET_CONTRACT_NAME,
+      FungibleConditionCode.LessEqual,
+      amount
+    );
     doContractCall({
       network: new StacksTestnet({ url: API_URL }),
       anchorMode: AnchorMode.Any,
@@ -85,8 +95,8 @@ function Send() {
         principalCV(recipientAddress),
         someCV(bufferCVFromString('test')),
       ],
-      postConditionMode: PostConditionMode.Allow,
-      postConditions: [],
+      postConditionMode: PostConditionMode.Deny,
+      postConditions: [pc],
       onFinish: (data) => {
         console.log('onFinish:', data);
         fetch('/api/send-message', {
