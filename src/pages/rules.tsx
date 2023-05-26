@@ -101,7 +101,7 @@ function Rules() {
       contractAddress: SMART_WALLET_CONTRACT_ADDRESS,
       contractName: SMART_WALLET_CONTRACT_NAME,
       functionName: 'add-stx-rule',
-      functionArgs: [uintCV(amount)],
+      functionArgs: [uintCV(amount * 1_000_000)],
       postConditionMode: PostConditionMode.Deny,
       postConditions: [],
       onFinish: (data) => {
