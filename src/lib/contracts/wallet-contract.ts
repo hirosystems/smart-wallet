@@ -2,7 +2,7 @@ import { SMART_WALLET_CONTRACT_NAME } from '../modules/constants';
 
 // this needs to be kept in sync with the smart wallet contract in clarity/contracts/wallet.clar
 export const smartWalletContract = {
-  name: SMART_WALLET_CONTRACT_NAME,
+  name: SMART_WALLET_CONTRACT_NAME + '1', // TODO: use uuid
   source: `;; title: IntelliSign Wallet
 ;; version: 0.1
 ;; summary: Smart Wallet

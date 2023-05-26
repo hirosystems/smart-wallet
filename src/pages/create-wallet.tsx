@@ -15,16 +15,8 @@ import { Controller, useForm } from 'react-hook-form';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { smartWalletContract } from '~/lib/contracts/wallet-contract';
 import { useCurrentNetwork } from '~/lib/hooks/use-current-network';
-import { DEVNET, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
+import { DEVNET } from '~/lib/modules/constants';
 import { openTxLink } from '~/lib/utils/transactions-utils';
-
-function fetchSigners(userAddress) {
-  return async () => {
-    const response = await fetch(`/api/get-signers?userAddress=${userAddress}`);
-    const data = await response.json();
-    return data.data.signers;
-  };
-}
 
 async function saveWalletOwnerMutation(formData) {
   const response = await fetch('/api/save-owner-info', {
@@ -52,9 +44,9 @@ function createWallet() {
       console.log(data);
       // await saveWalletOwnerMutation({ ...data, userAddress: testnetAddress });
       toast({
-        title: "",
+        title: '',
         description: `User info saved successfully`,
-        status: "success",
+        status: 'success',
       });
     } catch (error) {
       console.error('Error during form submission: ', error);
@@ -72,31 +64,35 @@ function createWallet() {
           const { txId } = data;
           openTxLink(txId, network.id);
           toast({
-            title: "",
+            title: '',
             description: `Wallet deployed successfully`,
-            status: "success",
+            status: 'success',
           });
-          router.push('/add-signer');
+          // router.push('/add-signer');
         },
         onCancel: () => {
           toast({
-            title: "",
+            title: '',
             description: `Wallet deployment cancelled`,
-            status: "error",
+            status: 'error',
           });
           console.log('doSTXTransfer onCancel');
         },
         onError: (error) => {
           toast({
-            title: "",
+            title: '',
             description: `Error deploying wallet`,
-            status: "error",
+            status: 'error',
           });
           console.log('doSTXTransfer onError', error);
         },
       });
     };
-    deployWalletAsync();
+    try {
+      deployWalletAsync();
+    } catch (error) {
+      console.error('Error deploying wallet: ', error);
+    }
   }, [router]);
 
   return (
@@ -145,21 +141,21 @@ function createWallet() {
         <Stack>
           <Button type="submit">Submit</Button>
 
-            <Tooltip
-              label={
-                !isSubmitted
-                  ? 'User details are required before deploying your smart wallet'
-                  : ''
-              }
-              hasArrow
+          <Tooltip
+            label={
+              !isSubmitted
+                ? 'User details are required before deploying your smart wallet'
+                : ''
+            }
+            hasArrow
+          >
+            <Button
+              isDisabled={!isSubmitted}
+              onClick={deployWalletOnClickHandler}
             >
-              <Button
-                isDisabled={!isSubmitted}
-                onClick={deployWalletOnClickHandler}
-              >
-                Deploy Smart Wallet
-              </Button>
-            </Tooltip>
+              Deploy Smart Wallet
+            </Button>
+          </Tooltip>
         </Stack>
       </form>
     </Box>
