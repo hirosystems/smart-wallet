@@ -7,18 +7,23 @@ import {
   HStack,
   Text,
 } from '@chakra-ui/react';
+import { useConnect } from '@stacks/connect-react';
+import { StacksTestnet } from '@stacks/network';
+import { AnchorMode, PostConditionMode } from '@stacks/transactions';
+import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
 import { DepositStx } from '~/lib/components/DepositStx';
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import { useHardcodedSmartWallet } from '~/lib/hooks/use-smart-wallet';
+import { API_URL, SMART_WALLET_CONTRACT_ADDRESS, SMART_WALLET_CONTRACT_NAME } from '~/lib/modules/constants';
 
 const Home = () => {
-  const { authenticate, isWalletConnected, mainnetAddress, disconnect } =
+  const { authenticate, isWalletConnected, mainnetAddress, disconnect, testnetAddress } =
     useContext(HiroWalletContext);
   const router = useRouter();
 
@@ -36,7 +41,36 @@ const Home = () => {
   //   hasSmartWallet,
   //   isLoading: isSmartWalletLoading,
   //   error,
+
   // } = useSmartWallet();
+
+  const { doContractCall } = useConnect();
+
+  async function getPendingTxs() {
+    // const args = functionArgs.map(arg => cvToHex(arg));
+    const body = JSON.stringify({
+      sender: testnetAddress,
+      arguments: [],
+    });
+    const url = `${API_URL}/v2/contracts/call-read/${SMART_WALLET_CONTRACT_ADDRESS}/${SMART_WALLET_CONTRACT_NAME}/get-pending-txs`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  
+    const data =  response.json();
+    console.log('get pending txs data', data)
+    return data
+  }
+
+  useEffect(() => {
+    if (!testnetAddress) return;
+    getPendingTxs()
+  }, [testnetAddress]);
 
   return (
     <Flex

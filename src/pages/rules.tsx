@@ -85,7 +85,9 @@ function Rules() {
       },
     });
   
-    return response.json();
+    const data = response.json();
+    console.log('data from getSTXRule', data)
+    return data
   }
 
   useEffect(() => {
