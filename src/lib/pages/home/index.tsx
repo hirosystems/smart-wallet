@@ -7,14 +7,11 @@ import {
   HStack,
   Text,
 } from '@chakra-ui/react';
-import { useConnect } from '@stacks/connect-react';
-import { StacksTestnet } from '@stacks/network';
-import { AnchorMode, PostConditionMode } from '@stacks/transactions';
-import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
+import { AnchorMode, cvToString, hexToCV, PostConditionMode } from '@stacks/transactions';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { Balances } from '~/lib/components/Balances';
 import { DepositStx } from '~/lib/components/DepositStx';
@@ -44,8 +41,6 @@ const Home = () => {
 
   // } = useSmartWallet();
 
-  const { doContractCall } = useConnect();
-
   async function getPendingTxs() {
     // const args = functionArgs.map(arg => cvToHex(arg));
     const body = JSON.stringify({
@@ -64,12 +59,19 @@ const Home = () => {
   
     const data =  await response.json();
     console.log('get pending txs data', data)
-    return data
+    const result = cvToString(hexToCV(data.result))
+    return result
   }
+
+  const [pendingTxs, setPendingTxs] = useState('');
 
   useEffect(() => {
     if (!testnetAddress) return;
-    getPendingTxs()
+    async function getTxs() {
+      const result = await getPendingTxs();
+      setPendingTxs(result);
+    }
+    getTxs();
   }, [testnetAddress]);
 
   return (
@@ -85,6 +87,12 @@ const Home = () => {
       padding="30px"
     >
       <NextSeo title="Home" />
+      <Box>
+        {pendingTxs && pendingTxs.length > 0 ? (
+          <Text fontSize="xl" fontWeight="bold">
+            Txs: {pendingTxs}
+          </Text>) : null}
+      </Box>
       <Text fontSize="xl" fontWeight="bold" textAlign="center">
         With the Smart Wallet you add a layer of security to your STX tokens.
         With our 2 of 2 multisig wallet your can be sure that your tokens are

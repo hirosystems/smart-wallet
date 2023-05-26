@@ -21,6 +21,8 @@ import {
   OptionalCV,
   PostConditionMode,
   bufferCVFromString,
+  cvToString,
+  hexToCV,
   serializeCV,
   someCV,
   stringUtf8CV,
@@ -69,7 +71,7 @@ function Rules() {
   );
   console.log('data signers', signers);
 
-  async function getSTXRule() {
+  async function getSTXRules() {
     const body = JSON.stringify({
       sender: testnetAddress,
       arguments: [],
@@ -86,12 +88,18 @@ function Rules() {
   
     const data = await response.json();
     console.log('data from getSTXRule', data)
-    return data
+    const result = cvToString(hexToCV(data.result))
+    return result
   }
 
+  const [stxRules, setStxRules] = useState('')
   useEffect(() => {
     if (!testnetAddress) return;
-    getSTXRule()
+    async function getRules() {
+      const result = await getSTXRules();
+      setStxRules(result);
+    }
+    getRules();
   }, [testnetAddress]);
 
 
@@ -125,6 +133,13 @@ function Rules() {
       mb={8}
       w="full"
     >
+      <Box>
+        {stxRules && stxRules.length > 0 ? (
+          <Text fontSize="xl" fontWeight="bold">
+            Rules: {stxRules}
+          </Text>) : null}
+      </Box>
+
       {signers && signers.length > 0 ? (
         <VStack spacing={4} align="stretch">
           <Table variant="simple">

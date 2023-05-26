@@ -92,7 +92,7 @@ function Send() {
         fetch('/api/send-message', {
           method: 'POST',
           body: JSON.stringify({
-            stxAddress: testnetAddress,
+            stxAddress: recipientAddress,
             txId: data.txId,
           }),
         }).then((response) => response.json());
