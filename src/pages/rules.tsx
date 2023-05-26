@@ -107,7 +107,7 @@ function Rules() {
         return { amountOrId, asset, id, kind }
       });
       console.log('formatted', formatted);
-      setStxRules(result);
+      setStxRules(formatted);
     }
     getRules();
   }, [testnetAddress]);
