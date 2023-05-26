@@ -62,7 +62,7 @@ const Home = () => {
       },
     });
   
-    const data =  response.json();
+    const data =  await response.json();
     console.log('get pending txs data', data)
     return data
   }

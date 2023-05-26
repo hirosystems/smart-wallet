@@ -70,7 +70,6 @@ function Rules() {
   console.log('data signers', signers);
 
   async function getSTXRule() {
-    // const args = functionArgs.map(arg => cvToHex(arg));
     const body = JSON.stringify({
       sender: testnetAddress,
       arguments: [],
@@ -85,7 +84,7 @@ function Rules() {
       },
     });
   
-    const data = response.json();
+    const data = await response.json();
     console.log('data from getSTXRule', data)
     return data
   }
