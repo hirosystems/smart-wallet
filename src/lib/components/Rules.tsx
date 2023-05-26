@@ -22,6 +22,17 @@ export const Rules = () => {
   const [stxRules, setStxRules] = useState();
   const { testnetAddress } = useContext(HiroWalletContext);
 
+  function getKindString(kind: string) {
+    switch (kind) {
+      case 'u0':
+        return 'STX';
+      case 'u1':
+        return 'FT';
+      case 'u2':
+        return 'NFT';
+    }
+  }
+
   async function getSTXRules() {
     const body = JSON.stringify({
       sender: testnetAddress,
@@ -70,8 +81,8 @@ export const Rules = () => {
             <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Th>Txid</Th>
-                  <Th>Recipient Address</Th>
+                  <Th>Kind</Th>
+                  <Th>Amount</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -79,14 +90,10 @@ export const Rules = () => {
                   {stxRules &&
                     stxRules?.length > 0 &&
                     stxRules.map((item) => {
-                      return (
-                        <Tr key={item}>
-                          <Td>{item['amountOrId']}</Td>
-                          <Td>{item['asset']}</Td>
-                          <Td>{item['id']}</Td>
-                          <Td>{item['kind']}</Td>
-                        </Tr>
-                      );
+                      return (<Tr key={item} >
+                        <Td>{getKindString(item['kind'])}</Td>
+                        <Td>{item['amountOrId']}</Td>
+                      </Tr>)
                     })}
                 </>
               </Tbody>

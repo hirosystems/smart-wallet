@@ -110,33 +110,6 @@ const Home = () => {
       padding="30px"
     >
       <NextSeo title="Home" />
-      {pendingTxs && pendingTxs?.length > 0 ? (
-        <>
-        <Text>Pending Transactions</Text>
-        <VStack spacing={4} align="stretch">
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Txid</Th>
-                <Th>Recipient Address</Th>
-                <Th>Amount</Th>
-              </Tr>
-            </Thead>
-              <Tbody>
-                <>
-                  {pendingTxs && pendingTxs.length > 0 && pendingTxs.map((item) => {
-                    return (<Tr key={item} >
-                      <Td>{item['txid']}</Td>
-                      <Td>{item['recipientAddress']}</Td>
-                      <Td>{item['amount']}</Td>
-                    </Tr>)
-                  })}
-                </>
-              </Tbody>
-            </Table>
-        </VStack>
-        </>
-      ) : null}
       <Text fontSize="xl" fontWeight="bold" textAlign="center">
         With the Smart Wallet you add a layer of security to your STX tokens.
         With our 2 of 2 multisig wallet your can be sure that your tokens are
@@ -191,6 +164,33 @@ const Home = () => {
           </HStack>
         </Flex>
       </Box>
+      {pendingTxs && pendingTxs?.length > 0 ? (
+        <>
+        <Text>Pending Transactions</Text>
+        <VStack spacing={4} align="stretch">
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Txid</Th>
+                <Th>Recipient Address</Th>
+                <Th>Amount</Th>
+              </Tr>
+            </Thead>
+              <Tbody>
+                <>
+                  {pendingTxs && pendingTxs.length > 0 && pendingTxs.map((item) => {
+                    return (<Tr key={item} >
+                      <Td>{item['txid']}</Td>
+                      <Td>{item['recipientAddress']}</Td>
+                      <Td>{item['amount']}</Td>
+                    </Tr>)
+                  })}
+                </>
+              </Tbody>
+            </Table>
+        </VStack>
+        </>
+      ) : null}
     </Flex>
   );
 };

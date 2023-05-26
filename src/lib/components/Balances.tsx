@@ -33,11 +33,6 @@ export const Balances = () => {
 
   return (
     <Stack border="1px solid white" padding="30px">
-      <h3>Hiro Wallet Balances</h3>
-      <StxBalance stxAssetBalance={hiroWalletStxAssetBalance} />
-      <StacksFungibleTokenAssetList
-        assetBalances={hiroWalletStacksFtAssetBalances}
-      />
       <h3>Smart Wallet Balances</h3>
       {hasSmartWallet ? (
         <>

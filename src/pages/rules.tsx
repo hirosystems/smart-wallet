@@ -32,6 +32,7 @@ import {
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
 } from '~/lib/modules/constants';
+import {Rules as RulesComponent} from '~/lib/components/Rules';
 
 function fetchSigners(userAddress: string) {
   return async () => {
@@ -142,37 +143,7 @@ function Rules() {
           notification will be sent to your co-signer for approval.
         </Text>
       </Box>
-      {stxRules && stxRules?.length > 0 ? (
-        <>
-          <Text>Active Rules</Text>
-          <VStack spacing={4} align="stretch">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Txid</Th>
-                  <Th>Recipient Address</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <>
-                  {stxRules &&
-                    stxRules?.length > 0 &&
-                    stxRules.map((item) => {
-                      return (
-                        <Tr key={item}>
-                          <Td>{item['amountOrId']}</Td>
-                          <Td>{item['asset']}</Td>
-                          <Td>{item['id']}</Td>
-                          <Td>{item['kind']}</Td>
-                        </Tr>
-                      );
-                    })}
-                </>
-              </Tbody>
-            </Table>
-          </VStack>
-        </>
-      ) : null}
+      <RulesComponent />
 
       {signers && signers.length > 0 ? (
         <VStack spacing={4} align="stretch">
