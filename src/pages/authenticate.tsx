@@ -9,6 +9,7 @@ import { useContext } from 'react';
 
 import HiroWalletContext from '~/lib/components/HiroWalletContext';
 import {
+  API_URL,
   EXPLORER_URL,
   SMART_WALLET_CONTRACT_ADDRESS,
   SMART_WALLET_CONTRACT_NAME,
@@ -21,7 +22,7 @@ export const getServerSideProps: GetServerSideProps<{
   return { props: { signers } };
 };
 
-const Authenticate = () => {
+function Authenticate () {
   // get the params address
   const router = useRouter();
 
@@ -78,22 +79,26 @@ const Authenticate = () => {
           </Text>
         ) : null}
         {isWalletConnected ? (
-          <Box>
+          <Flex direction="column" >
             <Text fontSize="xl" fontWeight="bold">
-              Confirm Transaction
+              Authenticate a transaction as a co-signer
             </Text>
-            <Button m={2} onClick={() => cosignTx(txid)}>
-              Confirm Transaction {txid}
-            </Button>
-            <Text>
-              <a
-                href={`${EXPLORER_URL}/txid/${txid}?chain=testnet`}
-                target="_blank"
-              >
-                View Transaction
-              </a>
-            </Text>
-          </Box>
+
+            <Flex direction="row" >
+              <Button m={2} mt={8} onClick={() => cosignTx(txid)} variant="primary">
+                Confirm Transaction {txid}
+              </Button>
+              <Button m={2} mt={8}>
+                <a
+                  href={`${EXPLORER_URL}/txid/${txid}?chain=testnet`}
+                  target="_blank"
+                >
+                  View Transaction
+                </a>
+              </Button>
+
+            </Flex>
+          </Flex>
         ) : null}
       </Box>
       <Box />

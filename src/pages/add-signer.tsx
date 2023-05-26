@@ -164,21 +164,21 @@ function AddSigner(props) {
           </Box>
           <form onSubmit={handleSubmit} style={{'width': '100%'}}>
             <FormControl id="stxAddress" isRequired>
-              <FormLabel>STX Address</FormLabel>
+              <FormLabel mt={4}>STX Address</FormLabel>
               <Input
                 type="text"
                 value={stxAddress}
                 onChange={(e) => setStxAddress(e.target.value)}
                 size="lg"
               />
-              <FormLabel>Email</FormLabel>
+              <FormLabel mt={4}>Email</FormLabel>
               <Input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 size="lg"
               />
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel mt={4}>Phone Number</FormLabel>
               <Input
                 type="text"
                 value={phoneNumber}
@@ -186,14 +186,14 @@ function AddSigner(props) {
                 size="lg"
               />
             </FormControl>
-            <Button mt={4} colorScheme="teal" type="submit">
-              Add
-            </Button>
             <Link href="/">
-              <Button ml={4} mt={4} colorScheme="teal" type="submit">
+              <Button mt={8} colorScheme="teal" type="submit">
                 Back
               </Button>
             </Link>
+            <Button ml={4} mt={8} colorScheme="teal" type="submit">
+              Add
+            </Button>
           </form>
         </>
       ) : null}

@@ -1,0 +1,3 @@
+input[aria-invalid=true].form-untouched {
+ border-color: transparent;
+}

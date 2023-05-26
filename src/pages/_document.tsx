@@ -3,9 +3,9 @@ import { ColorModeScript } from '@chakra-ui/react';
 import { Connect } from '@stacks/connect-react';
 import type { DocumentContext } from 'next/document';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
+import theme from "../theme";
 
 import Meta from '~/lib/components/Meta';
-import customTheme from '~/lib/styles/theme';
 
 class MyDocument extends Document {
   static getInitialProps(ctx: DocumentContext) {
@@ -17,15 +17,16 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <link
-            href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&display=swap"
-            rel="stylesheet"
+            rel="preload"
+            href="/fonts/AeonikFono/AeonikFono-Regular.woff2"
+            as="font"
+            crossOrigin="anonymous"
+            type="font/woff2"
           />
           <Meta />
         </Head>
         <body>
-          <ColorModeScript
-            initialColorMode={customTheme.config?.initialColorMode}
-          />
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
 
           <NextScript />

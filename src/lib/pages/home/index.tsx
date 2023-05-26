@@ -85,9 +85,11 @@ const Home = () => {
         <Flex>
           <HStack>
             {isWalletConnected && hasSmartWallet ? (
-              <Button>
-                <Link href={{ pathname: '/add-signer' }}>Add Co-signer</Link>
-              </Button>
+              <Link href={{ pathname: '/add-signer' }}>
+                <Button>
+                  Add Co-signer
+                </Button>
+              </Link>
             ) : null}
             {hasSmartWallet ? <DepositStx /> : null}
           </HStack>

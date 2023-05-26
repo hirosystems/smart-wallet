@@ -8,17 +8,17 @@ import { Chakra } from '~/lib/components/Chakra';
 import { userSession } from '~/lib/components/ConnectWallet';
 import { HiroWalletProvider } from '~/lib/components/HiroWalletContext';
 import Layout from '~/lib/layout';
-import '~/lib/styles/globals.css';
 import defaultSEOConfig from '../../next-seo.config';
+import "../styles/globals.css";
+import theme from "../theme";
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-// console.log('envs', process.env);
+import { ChakraProvider } from '@chakra-ui/react';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const queryClient = new QueryClient();
   return (
-    <Chakra>
+      <ChakraProvider theme={theme}>
       <Head>
         <meta
           name="viewport"
@@ -32,7 +32,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
             <Connect
               authOptions={{
                 appDetails: {
-                  name: 'Stacks Next.js Template',
+                  name: 'Smart Wallet',
                   icon: '',
                 },
                 redirectTo: '/',
@@ -47,7 +47,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
           </HiroWalletProvider>
         </Layout>
       </QueryClientProvider>
-    </Chakra>
+    </ChakraProvider>
   );
 };
 

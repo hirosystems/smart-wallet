@@ -30,8 +30,8 @@ function Pending() {
       mb={8}
       w="full"
     >
-      <Box>
-        <Text fontSize="xl" fontWeight="bold">
+      <Box mt={8}>
+        <Text fontSize="sm">
           Waiting for your co-signer to sign the transaction {txId}.
           You will be notified by email and sms when the co-signer has signed the transaction.
         </Text>
