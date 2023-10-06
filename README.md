@@ -1,3 +1,5 @@
+INTRO
+
 SMART WALLET
 
 pnpm install
