@@ -1,4 +1,5 @@
 ;; This contract implements the SIP-010 community-standard Fungible Token trait.
+;; this epd demo
 (impl-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; Define the FT, with no maximum supply
