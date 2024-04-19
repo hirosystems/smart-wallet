@@ -1,4 +1,5 @@
-SMART WALLET
+
+# SMART WALLET
 
 pnpm install
 
